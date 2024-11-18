@@ -1,0 +1,22 @@
+services:
+  app:
+    environment:
+      NODE_ENV: development
+    ports:
+      - '3000:3000'
+    command: yarn start:dev
+
+  postgres-db:
+    environment:
+      POSTGRES_DB: main_app_dev
+    ports:
+      - '5433:5432'
+
+  pgadmin:
+    ports:
+      - '8081:80'
+
+  mqtt-broker:
+    ports:
+      - '1884:1883' # MQTT port for dev
+      - '9002:9001' # WebSockets port for dev

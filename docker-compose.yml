@@ -1,0 +1,122 @@
+services:
+  app:
+    env_file:
+      - .env
+    container_name: mixx_mash
+    restart: always
+    build: .
+    ports:
+      - '${PORT}:${PORT}'
+    networks:
+      - app-network
+    environment:
+      MQTT_HOST: mqtt-broker
+      MQTT_PORT: 1883
+      DB_HOST: postgres
+      REDIS_HOST: redis
+    depends_on:
+      - postgres-db
+      - mqtt-broker
+      - redis
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+    restart: always
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    env_file:
+      - .env
+
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=redis:redis:6379:0:${REDIS_PASSWORD}
+    ports:
+      - '8081:8081'
+    networks:
+      - app-network
+    depends_on:
+      - redis
+
+  postgres-db:
+    image: timescale/timescaledb:latest-pg16
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      TZ: 'GMT'
+      PGTZ: 'GMT'
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres:/data/postgres
+      - ./init-data.sh:/docker-entrypoint-initdb.d/init-data.sh
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - '8080:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    volumes:
+      - pgadmin_data:/root/.pgadmin
+    networks:
+      - app-network
+    env_file:
+      - .env
+    depends_on:
+      - postgres-db
+
+  mqtt-broker:
+    image: eclipse-mosquitto
+    container_name: mqtt-broker
+    restart: always
+    ports:
+      - '1883:1883'
+      - '9001:9001'
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto/config/.mosquitto_passwd:/etc/mosquitto/passwd
+    networks:
+      - app-network
+    env_file:
+      - .env
+    command: >
+      /bin/sh -c "
+        chmod 600 /etc/mosquitto/passwd &&
+        chown mosquitto:mosquitto /etc/mosquitto/passwd &&
+        mosquitto -c /mosquitto/config/mosquitto.conf
+      "
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres:
+  pgadmin_data:
+  mosquitto_log:
+  mosquitto_data:
+  redis_data:

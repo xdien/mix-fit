@@ -1,0 +1,20 @@
+# Mosquitto MQTT Broker Configuration Example
+
+# Enable verbose logging
+log_type all
+
+# Default listener
+listener 0.0.0.0 1883
+
+# Path to store the persistence database
+persistence true
+#persistence_location /mosquitto/data/
+
+# Log destinations
+#log_dest file /mosquitto/log/mosquitto.log
+
+# Allow anonymous connections
+allow_anonymous true
+
+# Include other configuration files
+#include_dir /mosquitto/conf.d
