@@ -11,6 +11,7 @@ import { CommandLogEntity } from './entities/device-command.entity';
 import { IotControlController } from './iot-control.controller';
 import { IotControlService } from './iot-control.service';
 import { IoTCommandService } from './services/command.service';
+import { DeviceService } from './services/device.service';
 
 @Module({
   imports: [
@@ -20,13 +21,20 @@ import { IoTCommandService } from './services/command.service';
     }),
   ],
   controllers: [IotControlController, IoTCommandController],
-  exports: [IotControlService, IoTCommandService, CommandFactory, MqttService],
+  exports: [
+    IotControlService,
+    IoTCommandService,
+    CommandFactory,
+    MqttService,
+    DeviceService,
+  ],
   providers: [
     IotControlService,
     IoTCommandService,
     CommandFactory,
     CommandProcessor,
     MqttService,
+    DeviceService,
   ],
 })
 export class IotControlModule {}
