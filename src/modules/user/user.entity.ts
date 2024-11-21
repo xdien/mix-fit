@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany, OneToOne, VirtualColumn } from 'typeorm';
 import { AbstractWithIdEntity } from '../../common/abstract-with-id.entity';
 import { RoleType } from '../../constants';
 import { UseDto } from '../../decorators';
+import { DeviceEntity } from '../iot-control/entities/device.entity';
 import { PostEntity } from '../post/post.entity';
 import type { UserDtoOptions } from './dtos/user.dto';
 import { UserDto } from './dtos/user.dto';
@@ -43,4 +44,7 @@ export class UserEntity extends AbstractWithIdEntity<UserDto, UserDtoOptions> {
 
   @OneToMany(() => PostEntity, (postEntity) => postEntity.user)
   posts?: PostEntity[];
+
+  @OneToMany(() => DeviceEntity, (deviceEntity) => deviceEntity.owner)
+  devices?: DeviceEntity[];
 }
