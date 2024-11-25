@@ -1,13 +1,17 @@
-import type { CanActivate, ExecutionContext } from '@nestjs/common';
-import { Injectable } from '@nestjs/common';
+import type { CanActivate } from '@nestjs/common';
+import { ExecutionContext, Injectable, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 import { RoleType } from '../constants';
 import { DeviceService } from '../modules/iot-control/services/device.service';
 
 @Injectable()
 export class DeviceOwnerGuard implements CanActivate {
+  //   private readonly logger = new Logger(DeviceOwnerGuard.name);
+
   constructor(private deviceService: DeviceService) {}
 
+  @UseGuards(AuthGuard())
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<{
       params: { deviceId: string };
