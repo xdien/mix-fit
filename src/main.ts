@@ -17,7 +17,6 @@ import { initializeTransactionalContext } from 'typeorm-transactional';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './filters/bad-request.filter';
 import { QueryFailedFilter } from './filters/query-failed.filter';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { TranslationInterceptor } from './interceptors/translation-interceptor.service';
 // import { MqttService } from './mqtt/mqtt.service';
 import { setupSwagger } from './setup-swagger';
@@ -64,7 +63,6 @@ export async function bootstrap(): Promise<NestExpressApplication> {
     }),
   );
   //   app.useGlobalGuards(new JwtAuthGuard());
-  app.useGlobalGuards(new JwtAuthGuard());
 
   const configService = app.select(SharedModule).get(ApiConfigService);
 

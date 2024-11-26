@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, OneToOne, VirtualColumn } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 
 import { AbstractWithIdEntity } from '../../common/abstract-with-id.entity';
 import { RoleType } from '../../constants';
@@ -13,10 +13,7 @@ import { UserSettingsEntity } from './user-settings.entity';
 @UseDto(UserDto)
 export class UserEntity extends AbstractWithIdEntity<UserDto, UserDtoOptions> {
   @Column({ nullable: true, type: 'varchar' })
-  firstName!: string | null;
-
-  @Column({ nullable: true, type: 'varchar' })
-  lastName!: string | null;
+  fullName?: string | null;
 
   @Column({ type: 'enum', enum: RoleType, default: RoleType.USER })
   role!: RoleType;
@@ -32,12 +29,6 @@ export class UserEntity extends AbstractWithIdEntity<UserDto, UserDtoOptions> {
 
   @Column({ nullable: true, type: 'varchar' })
   avatar!: string | null;
-
-  @VirtualColumn({
-    query: (alias) =>
-      `SELECT CONCAT(${alias}.first_name, ' ', ${alias}.last_name)`,
-  })
-  fullName!: string;
 
   @OneToOne(() => UserSettingsEntity, (userSettings) => userSettings.user)
   settings?: UserSettingsEntity;

@@ -14,10 +14,7 @@ export type UserDtoOptions = Partial<{ isActive: boolean }>;
 
 export class UserDto extends AbstractWithIdDto {
   @StringFieldOptional({ nullable: true })
-  firstName?: string | null;
-
-  @StringFieldOptional({ nullable: true })
-  lastName?: string | null;
+  fullName?: string | null;
 
   @StringFieldOptional({ nullable: true })
   username!: string;
@@ -39,8 +36,7 @@ export class UserDto extends AbstractWithIdDto {
 
   constructor(user: UserEntity, options?: UserDtoOptions) {
     super(user);
-    this.firstName = user.firstName;
-    this.lastName = user.lastName;
+    this.fullName = user.fullName;
     this.role = user.role;
     this.email = user.email;
     this.avatar = user.avatar;
