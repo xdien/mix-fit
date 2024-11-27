@@ -56,6 +56,14 @@ export class AuthController {
     @Body() userRegisterDto: UserRegisterDto,
     @UploadedFile() file?: IFile,
   ): Promise<UserDto> {
+    const user = await this.userService.findByUsernameOrEmail({
+      email: userRegisterDto.email,
+    });
+
+    if (user) {
+      throw new Error('User already exists');
+    }
+
     const createdUser = await this.userService.createUser(
       userRegisterDto,
       file,
