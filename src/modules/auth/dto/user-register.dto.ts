@@ -7,10 +7,7 @@ import {
 
 export class UserRegisterDto {
   @StringField()
-  readonly firstName!: string;
-
-  @StringField()
-  readonly lastName!: string;
+  readonly fullName?: string;
 
   @EmailField()
   readonly email!: string;

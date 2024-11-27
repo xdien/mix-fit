@@ -2,9 +2,10 @@ import { AbstractWithIdDto } from '../../../common/dto/abstract-with-id.dto';
 import { RoleType } from '../../../constants';
 import {
   BooleanFieldOptional,
-  EmailFieldOptional,
-  EnumFieldOptional,
+  EmailField,
+  EnumField,
   PhoneFieldOptional,
+  StringField,
   StringFieldOptional,
 } from '../../../decorators';
 import type { UserEntity } from '../user.entity';
@@ -14,19 +15,16 @@ export type UserDtoOptions = Partial<{ isActive: boolean }>;
 
 export class UserDto extends AbstractWithIdDto {
   @StringFieldOptional({ nullable: true })
-  firstName?: string | null;
+  fullName?: string | null;
 
-  @StringFieldOptional({ nullable: true })
-  lastName?: string | null;
-
-  @StringFieldOptional({ nullable: true })
+  @StringField()
   username!: string;
 
-  @EnumFieldOptional(() => RoleType)
-  role?: RoleType;
+  @EnumField(() => RoleType)
+  role!: RoleType;
 
-  @EmailFieldOptional({ nullable: true })
-  email?: string | null;
+  @EmailField()
+  email!: string | null | undefined;
 
   @StringFieldOptional({ nullable: true })
   avatar?: string | null;
@@ -39,8 +37,7 @@ export class UserDto extends AbstractWithIdDto {
 
   constructor(user: UserEntity, options?: UserDtoOptions) {
     super(user);
-    this.firstName = user.firstName;
-    this.lastName = user.lastName;
+    this.fullName = user.fullName;
     this.role = user.role;
     this.email = user.email;
     this.avatar = user.avatar;

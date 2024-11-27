@@ -9,6 +9,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClsModule } from 'nestjs-cls';
 import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import { DataSource } from 'typeorm';
+import { addTransactionalDataSource } from 'typeorm-transactional';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { EventsGateway } from './modules/chat/events-gateway';
@@ -51,6 +53,15 @@ import { SharedModule } from './shared/shared.module';
       useFactory: (configService: ApiConfigService) => ({
         ...configService.postgresConfig,
       }),
+      dataSourceFactory: async (options) => {
+        if (!options) {
+          throw new Error('DataSource options are undefined');
+        }
+        const dataSource = await new DataSource(options).initialize();
+        addTransactionalDataSource(dataSource);
+
+        return dataSource;
+      },
       inject: [ApiConfigService],
     }),
     I18nModule.forRootAsync({

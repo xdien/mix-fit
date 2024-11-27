@@ -19,7 +19,7 @@
     "cms:migration:run": "typeorm migration:run -d /datasources/cms.datasource.ts",
     "cms:migration:revert": "typeorm migration:revert -d /datasources/cms.datasource.ts",
     "iot:migration:create": "typeorm migration:create ./src/database/migrations/iot/",
-    "iot:migration:generate": "yarn run typeorm migration:generate -d ./datasources/iot.datasource.ts",
+    "iot:migration:generate": "yarn run typeorm migration:generate -d ./src/datasources/iot.datasource.ts",
     "iot:migration:run": "typeorm migration:run -d ./datasources/iot.datasource.ts",
     "iot:migration:revert": "typeorm migration:revert -d ./datasources/iot.datasource.ts",
     "new": "hygen new",
