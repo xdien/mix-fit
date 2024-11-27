@@ -38,4 +38,8 @@ export class UserEntity extends AbstractWithIdEntity<UserDto, UserDtoOptions> {
 
   @OneToMany(() => DeviceEntity, (deviceEntity) => deviceEntity.owner)
   devices?: DeviceEntity[];
+
+  toDto(options?: Partial<{ isActive: boolean }> | undefined): UserDto {
+    return new UserDto(this, options);
+  }
 }
