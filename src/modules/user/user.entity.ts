@@ -19,16 +19,16 @@ export class UserEntity extends AbstractWithIdEntity<UserDto, UserDtoOptions> {
   role!: RoleType;
 
   @Column({ unique: true, nullable: true, type: 'varchar' })
-  email!: string | null;
+  email?: string | null;
 
   @Column({ nullable: true, type: 'varchar' })
   password!: string | null;
 
   @Column({ nullable: true, type: 'varchar' })
-  phone!: string | null;
+  phone?: string | null | undefined;
 
   @Column({ nullable: true, type: 'varchar' })
-  avatar!: string | null;
+  avatar?: string | null | undefined;
 
   @OneToOne(() => UserSettingsEntity, (userSettings) => userSettings.user)
   settings?: UserSettingsEntity;
