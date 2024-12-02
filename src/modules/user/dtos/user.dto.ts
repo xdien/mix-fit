@@ -21,7 +21,7 @@ export class UserDto extends AbstractWithIdDto {
   username!: string;
 
   @EnumField(() => RoleType)
-  role!: RoleType;
+  roles!: [RoleType];
 
   @EmailField()
   email!: string | null | undefined;
@@ -38,7 +38,7 @@ export class UserDto extends AbstractWithIdDto {
   constructor(user: UserEntity, options?: UserDtoOptions) {
     super(user);
     this.fullName = user.fullName;
-    this.role = user.role;
+    this.roles = user.roles;
     this.email = user.email;
     this.avatar = user.avatar;
     this.phone = user.phone;

@@ -1,5 +1,11 @@
 import type { CanActivate } from '@nestjs/common';
-import { ExecutionContext, Injectable, UseGuards } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { RoleType } from '../constants';
@@ -7,7 +13,7 @@ import { DeviceService } from '../modules/iot-control/services/device.service';
 
 @Injectable()
 export class DeviceOwnerGuard implements CanActivate {
-  //   private readonly logger = new Logger(DeviceOwnerGuard.name);
+  private readonly logger = new Logger(DeviceOwnerGuard.name);
 
   constructor(private deviceService: DeviceService) {}
 
@@ -15,9 +21,15 @@ export class DeviceOwnerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<{
       params: { deviceId: string };
-      user: { roles: RoleType[]; id: string };
+      user: { roles: RoleType[]; id: string } | undefined;
     }>();
+    this.logger.debug('UserId in', request.user?.id);
     const user = request.user;
+
+    if (user === undefined) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
     const deviceId = request.params.deviceId;
 
     if (

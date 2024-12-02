@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Param,
   Post,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -17,9 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { RoleType } from '../../../constants';
-import { Auth } from '../../../decorators';
-import { DeviceOwnerGuard } from '../../../guards/device-owner.guard';
+import { AuthWithDeviceOwner } from '../../../guards/auth-with-device-owner.guard';
 import { CommandPayloadDto } from '../dto/command-payload.dto';
 import { CommandStatusDto } from '../dto/command-status.dto';
 import { IoTCommandService } from '../services/command.service';
@@ -32,8 +29,7 @@ export class IoTCommandController {
   constructor(private readonly commandService: IoTCommandService) {}
 
   @Post(':deviceId')
-  @Auth([RoleType.USER])
-  @UseGuards(DeviceOwnerGuard)
+  @AuthWithDeviceOwner()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Gửi lệnh đến thiết bị IoT' })
   @ApiParam({
