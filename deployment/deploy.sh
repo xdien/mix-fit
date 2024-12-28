@@ -27,5 +27,4 @@ docker compose up -d
 echo "Cleaning up old images..."
 docker image prune -f
 
-# Xóa docker config sau khi hoàn thành
 rm -f ~/.docker/config.json
