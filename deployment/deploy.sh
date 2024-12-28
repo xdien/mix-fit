@@ -4,7 +4,6 @@ set -e
 # Nhận IMAGE_TAG từ tham số
 IMAGE_TAG=$1
 
-# Export các biến môi trường
 export GITHUB_REPOSITORY="xdien/mix-fit"
 export IMAGE_TAG=$IMAGE_TAG
 
