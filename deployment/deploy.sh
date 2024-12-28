@@ -11,7 +11,6 @@ export IMAGE_TAG=$IMAGE_TAG
 mkdir -p ~/.docker
 echo "{\"auths\":{\"ghcr.io\":{\"auth\":\"$(echo -n "${GITHUB_USERNAME}:${GITHUB_TOKEN}" | base64)\"}}}" > ~/.docker/config.json
 
-# Pull images mới
 echo "Pulling new images..."
 docker compose pull || {
     echo "Failed to pull images. Building from source..."
