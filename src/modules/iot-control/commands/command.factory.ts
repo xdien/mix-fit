@@ -2,12 +2,14 @@ import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { DeviceCommandType } from '../../../constants/device-command-type';
 import { MqttService } from '../../../mqtt/mqtt.service';
 import { CommandLogEntity } from '../entities/device-command.entity';
 import type { BaseCommand } from './base.command';
 import { BaseCommandFactory } from './base-command.factory';
 import type { ICommandPayload } from './iot-command.interface';
 import { LiquorKilnCommand } from './liquor-kiln.command';
+import { LiquorKilnV1Command } from './liquor-kiln-v1.command';
 
 export class CommandFactory extends BaseCommandFactory {
   private readonly logger = new Logger(CommandFactory.name);
@@ -40,8 +42,21 @@ export class CommandFactory extends BaseCommandFactory {
 
     this.logger.debug(`Creating command for device ${deviceId}`);
 
-    if (payload.deviceType === 'LIQUOR-KILN') {
+    if (
+      (payload.deviceType as DeviceCommandType) ===
+      DeviceCommandType.LIQUOR_KILN
+    ) {
       return new LiquorKilnCommand(
+        deviceId,
+        payload,
+        repository,
+        this.mqttService,
+      );
+    } else if (
+      (payload.deviceType as DeviceCommandType) ===
+      DeviceCommandType.LIQUOR_KILN_V1
+    ) {
+      return new LiquorKilnV1Command(
         deviceId,
         payload,
         repository,

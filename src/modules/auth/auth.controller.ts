@@ -42,7 +42,7 @@ export class AuthController {
 
     const token = await this.authService.createAccessToken({
       userId: userEntity.id,
-      role: userEntity.role,
+      roles: userEntity.roles,
     });
 
     return new LoginPayloadDto(userEntity.toDto(), token);
@@ -56,6 +56,14 @@ export class AuthController {
     @Body() userRegisterDto: UserRegisterDto,
     @UploadedFile() file?: IFile,
   ): Promise<UserDto> {
+    const user = await this.userService.findByUsernameOrEmail({
+      email: userRegisterDto.email,
+    });
+
+    if (user) {
+      throw new Error('User already exists');
+    }
+
     const createdUser = await this.userService.createUser(
       userRegisterDto,
       file,

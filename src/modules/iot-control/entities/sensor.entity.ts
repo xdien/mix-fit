@@ -1,26 +1,45 @@
-import { PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { StringFieldOptional } from '../../../decorators';
+import { DeviceTelemetryEntity } from '../../device-telemetry/enties/device-telemetry.entity';
+import { MeasurementUnitEntity } from './measurement-units.entity';
 
+@Entity({ name: 'sensors' })
 export class SensorEntity {
   @PrimaryGeneratedColumn('uuid')
   sensorId!: Uuid;
 
-  @StringFieldOptional({ nullable: false })
-  name!: string | null;
+  @StringFieldOptional()
+  name!: string;
 
   @StringFieldOptional({ nullable: true })
-  description?: string | null;
+  description?: string;
 
   @StringFieldOptional({ nullable: true })
-  type?: string | null;
+  type?: string;
 
   @StringFieldOptional({ nullable: true })
-  measurementUnitId?: string | null;
+  locationId?: string;
 
-  @StringFieldOptional({ nullable: true })
-  locationId?: string | null;
+  @Column({
+    type: 'jsonb',
+    nullable: true,
+    default: {},
+  })
+  metadata?: Record<string, unknown>;
 
-  @StringFieldOptional({ nullable: true })
-  metadata?: Record<string, unknown> | null;
+  @OneToMany(() => DeviceTelemetryEntity, (telemetry) => telemetry.sensor)
+  telemetry!: DeviceTelemetryEntity[];
+
+  @ManyToOne(
+    () => MeasurementUnitEntity,
+    (measurementUnit) => measurementUnit.sensors,
+  )
+  measurementUnit!: MeasurementUnitEntity;
 }

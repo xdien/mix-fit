@@ -13,6 +13,7 @@ import {
   IsEnum,
   IsInt,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   IsUrl,
@@ -434,7 +435,11 @@ export function EmailFieldOptional(
 export function PhoneField(
   options: Omit<ApiPropertyOptions, 'type'> & IFieldOptions = {},
 ): PropertyDecorator {
-  const decorators = [IsPhoneNumber(), PhoneNumberSerializer()];
+  const decorators = [];
+
+  if (!options.required) {
+    decorators.push(IsOptional());
+  }
 
   if (options.nullable) {
     decorators.push(IsNullable());
@@ -442,8 +447,16 @@ export function PhoneField(
     decorators.push(NotEquals(null));
   }
 
+  decorators.push(IsPhoneNumber(), PhoneNumberSerializer());
+
   if (options.swagger !== false) {
-    decorators.push(ApiProperty({ type: String, ...options }));
+    decorators.push(
+      ApiProperty({
+        type: String,
+        required: options.required !== false,
+        ...options,
+      }),
+    );
   }
 
   return applyDecorators(...decorators);

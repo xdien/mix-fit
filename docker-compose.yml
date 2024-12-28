@@ -2,7 +2,7 @@ services:
   app:
     env_file:
       - .env
-    container_name: mixx_mash
+    container_name: mix_fit
     restart: always
     build: .
     ports:

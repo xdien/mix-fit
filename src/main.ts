@@ -62,6 +62,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
       exceptionFactory: (errors) => new UnprocessableEntityException(errors),
     }),
   );
+  //   app.useGlobalGuards(new JwtAuthGuard());
 
   const configService = app.select(SharedModule).get(ApiConfigService);
 

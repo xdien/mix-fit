@@ -20,7 +20,7 @@ export class AuthService {
   ) {}
 
   async createAccessToken(data: {
-    role: RoleType;
+    roles: [RoleType];
     userId: Uuid;
   }): Promise<TokenPayloadDto> {
     return new TokenPayloadDto({
@@ -28,7 +28,7 @@ export class AuthService {
       accessToken: await this.jwtService.signAsync({
         userId: data.userId,
         type: TokenType.ACCESS_TOKEN,
-        role: data.role,
+        roles: data.roles,
       }),
     });
   }

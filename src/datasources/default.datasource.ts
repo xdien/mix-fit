@@ -1,3 +1,5 @@
+import '../boilerplate.polyfill';
+
 import dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 
