@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -12,6 +13,7 @@ import {
   StringField,
   StringFieldOptional,
 } from '../../../decorators';
+import { SensorEntity } from '../../iot-control/entities/sensor.entity';
 
 export enum MetricValueType {
   NUMERIC = 'numeric',
@@ -25,6 +27,10 @@ export enum MetricValueType {
 export class DeviceTelemetryEntity {
   @PrimaryGeneratedColumn('uuid')
   deviceTelemetryId!: string;
+
+  // telemetry has one sensor and sensor has many telemetry
+  @ManyToOne(() => SensorEntity, (sensor) => sensor.telemetry)
+  sensor!: SensorEntity;
 
   @DateField()
   time!: Date;

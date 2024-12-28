@@ -11,6 +11,8 @@ import {
 import { Ctx, EventPattern, MqttContext, Payload } from '@nestjs/microservices';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { RoleType } from '../../constants';
+import { Auth } from '../../decorators';
 import { DeviceTelemetryService } from './device-telemetry.service';
 import { TelemetryPayloadDto } from './dtos/telemetry.dto';
 import type {
@@ -36,6 +38,7 @@ export class DeviceTelemetryController {
   constructor(private readonly telemetryService: DeviceTelemetryService) {}
 
   @Post()
+  @Auth([RoleType.USER])
   @ApiOperation({ summary: 'Save device telemetry data' })
   @ApiOperation({
     summary: 'Save device telemetry data',
@@ -59,6 +62,7 @@ export class DeviceTelemetryController {
   }
 
   @Get(':deviceId/latest')
+  @Auth([RoleType.USER])
   @ApiOperation({ summary: 'Get latest metrics for device' })
   async getLatestMetrics(
     @Param('deviceId') deviceId: string,
@@ -70,6 +74,7 @@ export class DeviceTelemetryController {
   }
 
   @Get(':deviceId/history/:metricName')
+  @Auth([RoleType.USER])
   @ApiOperation({ summary: 'Get metric history for device' })
   async getMetricHistory(
     @Param('deviceId') deviceId: string,
@@ -181,6 +186,7 @@ export class DeviceTelemetryController {
   }
 
   @EventPattern('devices/+/telemetry')
+  //   @Auth([RoleType.USER])
   async handleTelemetryEvent(
     @Payload() message: ITelemetryMessage,
     @Ctx() context: MqttContext,
