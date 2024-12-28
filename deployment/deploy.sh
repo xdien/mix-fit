@@ -6,7 +6,6 @@ IMAGE_TAG=$1
 export GITHUB_REPOSITORY="xdien/mix-fit"
 export IMAGE_TAG=$IMAGE_TAG
 
-# Tạo docker config directory và file
 mkdir -p ~/.docker
 echo "{\"auths\":{\"ghcr.io\":{\"auth\":\"$(echo -n "${GITHUB_USERNAME}:${GITHUB_TOKEN}" | base64)\"}}}" > ~/.docker/config.json
 
