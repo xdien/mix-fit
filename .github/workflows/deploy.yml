@@ -39,6 +39,10 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          envs: GITHUB_TOKEN,GITHUB_USERNAME
+          environment:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_USERNAME: ${{ github.actor }}
           script: |
             cd ${{ secrets.ROOT_APP }}/app/deployment
             ./deploy.sh ${{ github.sha }}
