@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 
-import { UplinkController } from './uplink.controller';
+// import { UplinkController } from './uplink.controller';
 
 @Module({
-  controllers: [UplinkController],
+  controllers: [],
 })
 export class IotModule {}

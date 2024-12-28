@@ -31,15 +31,15 @@ export class IoTCommandController {
   @Post(':deviceId')
   @AuthWithDeviceOwner()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Gửi lệnh đến thiết bị IoT' })
+  @ApiOperation({ summary: 'Send command to device' })
   @ApiParam({
     name: 'deviceId',
-    description: 'ID của thiết bị IoT',
+    description: 'ID of the device',
     example: 'device-123',
   })
   @ApiBody({ type: CommandPayloadDto })
   @ApiCreatedResponse({
-    description: 'Lệnh đã được gửi thành công',
+    description: 'Command sent successfully',
     type: CommandStatusDto,
   })
   async sendCommand(
@@ -50,15 +50,16 @@ export class IoTCommandController {
   }
 
   @Get(':commandId/status')
-  @ApiOperation({ summary: 'Lấy trạng thái của lệnh' })
+  //   @AuthWithDeviceOwner()
+  @ApiOperation({ summary: 'Get status of command' })
   @ApiParam({
     name: 'commandId',
-    description: 'ID của lệnh cần kiểm tra',
+    description: 'ID of the command',
     example: 'cmd-123',
   })
   @ApiResponse({
     status: 200,
-    description: 'Trạng thái hiện tại của lệnh',
+    description: 'Status of the command',
     type: CommandStatusDto,
   })
   async getStatus(@Param('commandId') commandId: string) {

@@ -17,14 +17,14 @@ import {
 import { AuthWithDeviceOwner } from '../../../guards/auth-with-device-owner.guard';
 import { CommandPayloadDto } from '../dto/command-payload.dto';
 import { CommandStatusDto } from '../dto/command-status.dto';
-import { IoTCommandService } from '../services/command.service';
+import { IoTCommandV1Service } from '../services/command-v1.service';
 
-@Controller('iot/v1/commands')
+@Controller('/v1/iot/commands')
 @ApiTags('IoT Commands')
-export class IoTCommandController {
+export class IoTCommandControllerV1 {
   //   private readonly _logger = new Logger(IoTCommandController.name);
 
-  constructor(private readonly commandService: IoTCommandService) {}
+  constructor(private readonly commandService: IoTCommandV1Service) {}
 
   @Post(':deviceId')
   @AuthWithDeviceOwner()
@@ -32,12 +32,12 @@ export class IoTCommandController {
   @ApiOperation({ summary: 'Send command to device' })
   @ApiParam({
     name: 'deviceId',
-    description: 'ID của thiết bị IoT',
+    description: 'Id of device',
     example: 'device-123',
   })
   @ApiBody({ type: CommandPayloadDto })
   @ApiCreatedResponse({
-    description: 'Lệnh đã được gửi thành công',
+    description: 'Command has been sent successfully',
     type: CommandStatusDto,
   })
   async sendCommand(
