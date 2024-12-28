@@ -19,7 +19,6 @@ docker compose pull || {
     docker compose build
 }
 
-# Restart services với images mới
 echo "Restarting services..."
 docker compose up -d
 
