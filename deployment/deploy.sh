@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-# Nhận IMAGE_TAG từ tham số
 IMAGE_TAG=$1
 
 export GITHUB_REPOSITORY="xdien/mix-fit"
