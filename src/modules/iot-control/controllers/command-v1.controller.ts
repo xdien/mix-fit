@@ -6,13 +6,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
-import {
-  ApiBody,
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiParam,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthWithDeviceOwner } from '../../../guards/auth-with-device-owner.guard';
 import { CommandPayloadDto } from '../dto/command-payload.dto';
@@ -30,12 +24,6 @@ export class IoTCommandControllerV1 {
   @AuthWithDeviceOwner()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Send command to device' })
-  @ApiParam({
-    name: 'deviceId',
-    description: 'Id of device',
-    example: 'device-123',
-  })
-  @ApiBody({ type: CommandPayloadDto })
   @ApiCreatedResponse({
     description: 'Command has been sent successfully',
     type: CommandStatusDto,
