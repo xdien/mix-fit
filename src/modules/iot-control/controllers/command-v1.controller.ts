@@ -31,12 +31,10 @@ export class IoTCommandControllerV1 {
   @ApiOperation({ summary: 'Send command to device' })
   @ApiParam({
     name: 'deviceId',
-    description: 'Id of device',
-    example: 'device-123',
     required: true,
-    schema: {
-      type: 'string',
-    },
+    description: 'ID of the device',
+    example: 'device-123',
+    type: String,
   })
   @ApiCreatedResponse({
     description: 'Command has been sent successfully',

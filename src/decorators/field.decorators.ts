@@ -416,10 +416,10 @@ export function EmailField(
 
   const decorators = [
     IsEmail(),
-    StringField({ toLowerCase, ...options }), // Giữ toLowerCase cho validation/transformation
+    StringField({ toLowerCase, ...options }),
     ApiProperty({
       type: String,
-      ...apiOptions, // Không bao gồm toLowerCase trong API documentation
+      ...apiOptions,
     }),
   ];
 
