@@ -1,16 +1,16 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import type { Type } from '@nestjs/common';
-import { applyDecorators, HttpStatus } from '@nestjs/common';
-import type { ApiResponseOptions } from '@nestjs/swagger';
+import { applyDecorators } from '@nestjs/common';
 import {
   ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
-  ApiResponse,
   getSchemaPath,
 } from '@nestjs/swagger';
 
 import { PageDto } from '../common/dto/page.dto';
+import { PageMetaDto } from '../common/dto/page-meta.dto';
 
 export function ApiPageResponse<T extends Type>(options: {
   type: T;
@@ -37,26 +37,23 @@ export function ApiPageResponse<T extends Type>(options: {
       required: false,
       description: 'Items per page',
     }),
-    ApiResponse({
-      status: HttpStatus.OK,
-      description: options.description,
-      type: options.type,
-    }),
     ApiOkResponse({
       description: options.description,
       schema: {
+        title: 'PageResponseOf' + options.type.name,
         allOf: [
-          { $ref: getSchemaPath(PageDto) },
           {
+            type: 'object',
             properties: {
-              results: {
+              data: {
                 type: 'array',
                 items: { $ref: getSchemaPath(options.type) },
               },
+              meta: { $ref: getSchemaPath(PageMetaDto) },
             },
           },
         ],
       },
-    } as ApiResponseOptions | undefined),
+    }),
   );
 }
