@@ -43,5 +43,6 @@ export class UserDto extends AbstractWithIdDto {
     this.avatar = user.avatar;
     this.phone = user.phone;
     this.isActive = options?.isActive;
+    this.username = user.username;
   }
 }

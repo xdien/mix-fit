@@ -8,9 +8,9 @@ import {
 } from '../../../decorators';
 
 export class UserRegisterDto {
-  @ApiProperty({ required: false })
-  @StringField()
-  readonly fullName?: string;
+  @ApiProperty({ minLength: 5, maxLength: 30, required: true })
+  @StringField({ minLength: 5, required: true })
+  readonly username!: string;
 
   @ApiProperty()
   @EmailField()
@@ -19,6 +19,10 @@ export class UserRegisterDto {
   @ApiProperty({ minLength: 6 })
   @PasswordField({ minLength: 6 })
   readonly password!: string;
+
+  @ApiProperty({ required: false })
+  @StringField()
+  readonly fullName?: string;
 
   @ApiProperty({ required: false })
   @PhoneFieldOptional()

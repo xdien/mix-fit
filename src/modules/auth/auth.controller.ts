@@ -67,11 +67,12 @@ export class AuthController {
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['email', 'password', 'fullName'],
+      required: ['email', 'password', 'username'],
       properties: {
-        fullName: {
+        username: {
           type: 'string',
-          example: 'John Doe',
+          nullable: false,
+          example: 'username',
         },
         email: {
           type: 'string',
@@ -80,6 +81,10 @@ export class AuthController {
         password: {
           type: 'string',
           example: '******',
+        },
+        fullName: {
+          type: 'string',
+          example: 'John Doe',
         },
         phone: {
           type: 'string',
