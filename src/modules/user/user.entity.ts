@@ -12,6 +12,9 @@ import { UserSettingsEntity } from './user-settings.entity';
 @Entity({ name: 'users' })
 @UseDto(UserDto)
 export class UserEntity extends AbstractWithIdEntity<UserDto, UserDtoOptions> {
+  @Column({ nullable: false, type: 'varchar' })
+  username!: string;
+
   @Column({ nullable: true, type: 'varchar' })
   fullName?: string | null;
 
