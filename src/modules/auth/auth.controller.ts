@@ -1,13 +1,16 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Post,
   UploadedFile,
+  UseInterceptors,
   Version,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBody,
   ApiConsumes,
@@ -25,6 +28,7 @@ import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/login-payload.dto';
 import { UserLoginDto } from './dto/user-login.dto';
+import type { UserRegisterDto } from './dto/user-register.dto';
 // import { UserRegisterDto } from './dto/user-register.dto';
 
 @Controller('auth')
@@ -55,6 +59,7 @@ export class AuthController {
   }
 
   @Post('register')
+  @UseInterceptors(FileInterceptor('avatar'))
   @HttpCode(HttpStatus.OK)
   @ApiOkResponse({ type: UserDto, description: 'Successfully Registered' })
   @ApiOperation({ summary: 'Register new user' }) // Thêm mô tả operation
@@ -90,17 +95,11 @@ export class AuthController {
     },
   })
   async userRegister(
-    @Body('email') email: string,
-    @Body('password') password: string,
-    @Body('fullName') fullName: string,
-    @Body('phone') phone?: string,
+    @Body() body: unknown,
     @UploadedFile() file?: IFile,
   ): Promise<UserDto> {
     const userRegisterDto = {
-      email,
-      password,
-      fullName,
-      phone,
+      ...(body as UserRegisterDto),
     };
 
     const user = await this.userService.findByUsernameOrEmail({
@@ -108,7 +107,9 @@ export class AuthController {
     });
 
     if (user) {
-      throw new Error('User already exists');
+      throw new ConflictException(
+        `User already exists  ${JSON.stringify(userRegisterDto.email)}`,
+      );
     }
 
     const createdUser = await this.userService.createUser(
