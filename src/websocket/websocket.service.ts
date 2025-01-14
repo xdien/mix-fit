@@ -64,8 +64,6 @@ export class WebsocketService {
     });
   }
 
-  // ... các methods khác giữ nguyên
-
   async authenticateClient(token: string): Promise<IAuthPayload> {
     try {
       return await this.jwtService.verifyAsync(token);

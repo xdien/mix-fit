@@ -17,7 +17,7 @@ import type { IAuthPayload } from './interfaces/auth-payload.interface';
 import { WebsocketService } from './websocket.service';
 
 @WebSocketGateway({
-  path: '/websockets',
+  path: '/ws',
   cors: {
     origin: '*',
   },
