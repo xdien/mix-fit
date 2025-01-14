@@ -8,7 +8,6 @@ import {
   Post,
 } from '@nestjs/common';
 import {
-  ApiBody,
   ApiCreatedResponse,
   ApiOperation,
   ApiParam,
@@ -37,7 +36,6 @@ export class IoTCommandController {
     description: 'ID of the device',
     example: 'device-123',
   })
-  @ApiBody({ type: CommandPayloadDto })
   @ApiCreatedResponse({
     description: 'Command sent successfully',
     type: CommandStatusDto,

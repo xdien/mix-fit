@@ -2,7 +2,6 @@
 
 - A personal hobby project aimed at creating a unified integration platform, initially focused on IoT devices with potential for future expansions.
 
-
 ## Getting started
 
 ```bash
@@ -32,12 +31,18 @@ And, enjoy :)
 
 ```bash
 # 4. Run development server and open http://localhost:3000
-# Start dependent services 
+# Start dependent services
 docker compose build
 docker compose up
 
 yarn watch:dev
 
+```
+
+#### Genenrate migration
+
+```bash
+yarn run typeorm migration:generate -d ./src/datasources/default.datasource.ts init1
 ```
 
 ### Build
@@ -89,4 +94,3 @@ This project includes a `docs` folder with more details on:
 ## Community
 
 For help, discussion about best practices, or any other conversation that would benefit from being searchable:
-

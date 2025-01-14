@@ -1,4 +1,5 @@
-import { BooleanField, NumberField } from '../../decorators';
+import { ApiProperty } from '@nestjs/swagger';
+
 import type { PageOptionsDto } from './page-options.dto';
 
 interface IPageMetaDtoParameters {
@@ -7,22 +8,22 @@ interface IPageMetaDtoParameters {
 }
 
 export class PageMetaDto {
-  @NumberField()
+  @ApiProperty()
   readonly page: number;
 
-  @NumberField()
+  @ApiProperty()
   readonly take: number;
 
-  @NumberField()
+  @ApiProperty()
   readonly itemCount: number;
 
-  @NumberField()
+  @ApiProperty()
   readonly pageCount: number;
 
-  @BooleanField()
+  @ApiProperty()
   readonly hasPreviousPage: boolean;
 
-  @BooleanField()
+  @ApiProperty()
   readonly hasNextPage: boolean;
 
   constructor({ pageOptionsDto, itemCount }: IPageMetaDtoParameters) {
