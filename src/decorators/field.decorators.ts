@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable unicorn/no-null */
 import { applyDecorators } from '@nestjs/common';
 import type { ApiPropertyOptions } from '@nestjs/swagger';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
@@ -119,9 +120,16 @@ export function NumberFieldOptional(
   options: Omit<ApiPropertyOptions, 'type' | 'required'> &
     INumberFieldOptions = {},
 ): PropertyDecorator {
+  const { ...validationOptions } = options;
+
   return applyDecorators(
     IsUndefinable(),
     Column({ nullable: true }),
+    ApiPropertyOptional({
+      type: 'integer', // Thay vì truyền int: true
+      ...validationOptions,
+    }),
+    Type(() => Number),
     NumberField({ required: false, ...options }),
   );
 }
@@ -404,19 +412,21 @@ export function ClassFieldOptional<TClass extends Constructor>(
 export function EmailField(
   options: Omit<ApiPropertyOptions, 'type'> & IStringFieldOptions = {},
 ): PropertyDecorator {
+  const { toLowerCase, ...apiOptions } = options;
+
   const decorators = [
     IsEmail(),
-    StringField({ toLowerCase: true, ...options }),
+    StringField({ toLowerCase, ...options }),
+    ApiProperty({
+      type: String,
+      ...apiOptions,
+    }),
   ];
 
   if (options.nullable) {
     decorators.push(IsNullable());
   } else {
     decorators.push(NotEquals(null));
-  }
-
-  if (options.swagger !== false) {
-    decorators.push(ApiProperty({ type: String, ...options }));
   }
 
   return applyDecorators(...decorators);

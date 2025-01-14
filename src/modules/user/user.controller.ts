@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { PageDto } from '../../common/dto/page.dto';
+import type { PageDto } from '../../common/dto/page.dto';
 import { RoleType } from '../../constants';
 import { ApiPageResponse, Auth, AuthUser, UUIDParam } from '../../decorators';
 import { UseLanguageInterceptor } from '../../interceptors/language-interceptor.service';
@@ -45,7 +45,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   @ApiPageResponse({
     description: 'Get users list',
-    type: PageDto,
+    type: UserDto,
   })
   getUsers(
     @Query(new ValidationPipe({ transform: true }))
