@@ -25,6 +25,7 @@ import { UserModule } from './modules/user/user.module';
 import { MqttModule } from './mqtt/mqtt.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { SharedModule } from './shared/shared.module';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -114,6 +115,7 @@ import { SharedModule } from './shared/shared.module';
         };
       },
     }),
+    WebsocketModule,
     HealthCheckerModule,
     MqttModule,
     IotModule,
