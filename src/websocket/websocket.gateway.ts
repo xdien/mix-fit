@@ -1,5 +1,5 @@
 // websocket/websocket.gateway.ts
-import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
+import { forwardRef, Inject, Logger } from '@nestjs/common';
 import type {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -12,7 +12,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, WebSocket } from 'ws';
 
-import { WsAuthGuard } from '../guards/ws-auth.guard';
+// import { WsAuthGuard } from '../guards/ws-auth.guard';
 import type { IAuthPayload } from './interfaces/auth-payload.interface';
 import { WebsocketService } from './websocket.service';
 
@@ -39,7 +39,8 @@ export class WebsocketGateway
     this.logger.log('WebSocket Gateway initialized');
   }
 
-  @UseGuards(WsAuthGuard)
+  //   @UseGuards(WsAuthGuard)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async handleConnection(client: WebSocket, ...args: unknown[]) {
     try {
       const headers = args[0];
@@ -49,7 +50,10 @@ export class WebsocketGateway
       const payload: IAuthPayload =
         await this.websocketService.authenticateClient(token);
 
-      this.websocketService.registerClient(client, payload);
+      this.websocketService.registerClient(client, {
+        token,
+        userId: payload.userId,
+      });
 
       client.send(
         JSON.stringify({
@@ -72,9 +76,15 @@ export class WebsocketGateway
     this.logger.log('Client disconnected');
   }
 
+  @SubscribeMessage('ping')
+  handlePing(client: WebSocket, userId: string): void {
+    Logger.log(`Received ping from ${client.eventNames()} ${userId}`);
+  }
+
   @SubscribeMessage('pong')
   handlePong(client: WebSocket, userId: string): void {
-    Logger.log(`Received pong from ${client.eventNames()}`);
+    this.logger.log(`Received pong from ${client.eventNames()}`);
+    // Logger.log(`Received pong from ${client.eventNames()}`);
     this.websocketService.handlePong(userId);
   }
 

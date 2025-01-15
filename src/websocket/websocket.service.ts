@@ -82,6 +82,14 @@ export class WebsocketService {
     }
   }
 
+  handlePing(userId: string): void {
+    const client = this.clients.get(userId);
+
+    if (client?.isAlive) {
+      client.ws.send(JSON.stringify({ type: 'pong' }));
+    }
+  }
+
   removeClient(userId: string): void {
     const client = this.clients.get(userId);
 
