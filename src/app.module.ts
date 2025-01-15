@@ -24,7 +24,6 @@ import { UserModule } from './modules/user/user.module';
 import { MqttModule } from './mqtt/mqtt.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { SharedModule } from './shared/shared.module';
-import { WebsocketGateway } from './websocket/websocket.gateway';
 import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
@@ -124,7 +123,7 @@ import { WebsocketModule } from './websocket/websocket.module';
     IotControlModule,
     DeviceTelemetryModule,
   ],
-  providers: [WebsocketGateway],
+  providers: [],
   controllers: [],
 })
 export class AppModule {}
