@@ -1,5 +1,5 @@
 // websocket/websocket.gateway.ts
-import { Logger, UseGuards } from '@nestjs/common';
+import { forwardRef, Inject, Logger, UseGuards } from '@nestjs/common';
 import type {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -30,7 +30,10 @@ export class WebsocketGateway
 
   private logger: Logger = new Logger('WebsocketGateway');
 
-  constructor(private readonly websocketService: WebsocketService) {}
+  constructor(
+    @Inject(forwardRef(() => WebsocketService))
+    private readonly websocketService: WebsocketService,
+  ) {}
 
   afterInit(_server: Server) {
     this.logger.log('WebSocket Gateway initialized');
@@ -39,11 +42,10 @@ export class WebsocketGateway
   @UseGuards(WsAuthGuard)
   async handleConnection(client: WebSocket, ...args: unknown[]) {
     try {
-      const headers = args[0] as {
-        authorization?: string;
-        Authorization?: string;
-      };
-      const token = this.extractTokenFromHeader(headers);
+      const headers = args[0];
+      const token = this.extractTokenFromHeader(
+        headers as { rawHeaders: string[] },
+      );
       const payload: IAuthPayload =
         await this.websocketService.authenticateClient(token);
 
@@ -76,22 +78,31 @@ export class WebsocketGateway
     this.websocketService.handlePong(userId);
   }
 
-  private extractTokenFromHeader(headers: {
-    authorization?: string;
-    Authorization?: string;
-  }): string {
-    const authHeader = headers.authorization ?? headers.Authorization;
+  private extractTokenFromHeader(headers: { rawHeaders: string[] }): string {
+    const arrayHeaders = headers.rawHeaders;
 
-    if (!authHeader) {
-      throw new Error('No authorization header');
+    if (arrayHeaders.length > 0) {
+      const authIndex = arrayHeaders.findIndex(
+        (h: string) => h.toLowerCase() === 'authorization',
+      );
+
+      if (authIndex >= 0) {
+        const authHeader = headers.rawHeaders[authIndex + 1];
+
+        if (!authHeader) {
+          throw new Error('No authorization header');
+        }
+
+        const [type, token] = authHeader.split(' ');
+
+        if (type !== 'Bearer' || !token) {
+          throw new Error('Invalid token type');
+        }
+
+        return token;
+      }
     }
 
-    const [type, token] = authHeader.split(' ');
-
-    if (type !== 'Bearer' || !token) {
-      throw new Error('Invalid token type');
-    }
-
-    return token;
+    throw new Error('No authorization header');
   }
 }
