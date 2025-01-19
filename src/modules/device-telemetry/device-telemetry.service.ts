@@ -2,7 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
 
+import { WebsocketService } from '../../websocket/websocket.service';
 import type { ITelemetryPayload } from '../device-telemetry/telemetry.types';
+import type { OilTemperatureEvent } from './dtos/temperature-event.dto';
 import { DeviceTelemetryEntity } from './enties/device-telemetry.entity';
 
 @Injectable()
@@ -12,6 +14,7 @@ export class DeviceTelemetryService {
   constructor(
     @InjectRepository(DeviceTelemetryEntity)
     private telemetryRepo: Repository<DeviceTelemetryEntity>,
+    private websocketService: WebsocketService,
   ) {}
 
   async saveTelemetryBatch(payload: ITelemetryPayload): Promise<void> {
@@ -111,5 +114,14 @@ export class DeviceTelemetryService {
     });
 
     this.logger.log(`Deleted telemetry data older than ${retentionDays} days`);
+  }
+
+  // push data to websocket
+  pushDataToWebsocket(data: OilTemperatureEvent): Promise<void> {
+    this.logger.log('Pushing data to websocket');
+    this.logger.log(data);
+    this.websocketService.broadcastToAuthenticatedUsers(data);
+
+    return Promise.resolve();
   }
 }

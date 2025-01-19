@@ -9,12 +9,18 @@ import {
   Query,
 } from '@nestjs/common';
 import { Ctx, EventPattern, MqttContext, Payload } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { RoleType } from '../../constants';
 import { Auth } from '../../decorators';
 import { DeviceTelemetryService } from './device-telemetry.service';
 import { TelemetryPayloadDto } from './dtos/telemetry.dto';
+import { OilTemperatureEvent } from './dtos/temperature-event.dto';
 import type {
   IMetric,
   IMetricWithMetadata,
@@ -32,6 +38,7 @@ interface ITelemetryMessage {
 
 @Controller('telemetry')
 @ApiTags('Telemetry')
+@ApiExtraModels(OilTemperatureEvent)
 export class DeviceTelemetryController {
   private readonly logger = new Logger(DeviceTelemetryController.name);
 
@@ -202,6 +209,19 @@ export class DeviceTelemetryController {
 
       const telemetryData = this.transformToTelemetryPayload(deviceId, message);
       await this.telemetryService.saveTelemetryBatch(telemetryData);
+      const temperatureCloudevent = {
+        specversion: '1.0',
+        type: 'temperature',
+        source: 'device/1',
+        id: 'A234-1234-1234',
+        time: new Date().toISOString(),
+        datacontenttype: 'application/json',
+        data: {
+          temperature: telemetryData.metrics[0]?.value as number,
+          deviceId: 'device-1',
+        },
+      };
+      await this.telemetryService.pushDataToWebsocket(temperatureCloudevent);
     } catch (error) {
       if (error instanceof Error) {
         this.logger.error(
