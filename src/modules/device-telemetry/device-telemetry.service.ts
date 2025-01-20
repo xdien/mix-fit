@@ -120,7 +120,7 @@ export class DeviceTelemetryService {
   pushDataToWebsocket(data: OilTemperatureEvent): Promise<void> {
     this.logger.log('Pushing data to websocket');
     this.logger.log(data);
-    this.websocketService.broadcastToAuthenticatedUsers(data);
+    this.websocketService.broadcastToChannel('sensor.temperature', data);
 
     return Promise.resolve();
   }
