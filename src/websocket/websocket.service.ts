@@ -12,6 +12,8 @@ export class WebsocketService {
 
   private readonly clients = new Map<string, ISocketClient>();
 
+  private readonly channelSubscriptions = new Map<string, Set<string>>();
+
   private readonly heartbeatInterval = 30_000;
 
   private readonly heartbeatTimeout = 5000;
@@ -105,6 +107,41 @@ export class WebsocketService {
     for (const [, client] of this.clients) {
       if (client.isAlive && client.ws.readyState === WebSocket.OPEN) {
         client.ws.send(JSON.stringify(message));
+      }
+    }
+  }
+
+  subscribeToChannel(channelId: string, clientId: string) {
+    if (!this.channelSubscriptions.has(channelId)) {
+      this.channelSubscriptions.set(channelId, new Set());
+    }
+
+    this.channelSubscriptions.get(channelId)?.add(clientId);
+  }
+
+  unsubscribeFromChannel(channelId: string, clientId: string) {
+    const subscribers = this.channelSubscriptions.get(channelId);
+
+    if (subscribers) {
+      subscribers.delete(clientId);
+
+      if (subscribers.size === 0) {
+        this.channelSubscriptions.delete(channelId);
+      }
+    }
+  }
+
+  // Broadcast message to all clients subscribed to a channel
+  broadcastToChannel(channelId: string, message: unknown) {
+    const subscribers = this.channelSubscriptions.get(channelId);
+
+    if (subscribers) {
+      for (const clientId of subscribers) {
+        const client = this.clients.get(clientId);
+
+        if (client?.isAlive && client.ws.readyState === WebSocket.OPEN) {
+          client.ws.send(JSON.stringify(message));
+        }
       }
     }
   }

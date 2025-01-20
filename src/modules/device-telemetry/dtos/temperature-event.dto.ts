@@ -16,6 +16,13 @@ export class OilTemperatureData {
     maximum: 500,
   })
   temperature!: number;
+
+  // timestamp: double;
+  @ApiProperty({
+    description: 'Timestamp of the event',
+    example: '2024-01-19T10:00:00Z',
+  })
+  timestamp!: Date;
 }
 
 export class OilTemperatureEvent extends CloudEventDto<OilTemperatureData> {
@@ -30,6 +37,7 @@ export class OilTemperatureEvent extends CloudEventDto<OilTemperatureData> {
     this.data = {
       deviceId,
       temperature,
+      timestamp: new Date(),
     };
     this.id = crypto.randomUUID();
     this.time = new Date().toISOString();

@@ -219,6 +219,7 @@ export class DeviceTelemetryController {
         data: {
           temperature: telemetryData.metrics[0]?.value as number,
           deviceId: 'device-1',
+          timestamp: new Date(),
         },
       };
       await this.telemetryService.pushDataToWebsocket(temperatureCloudevent);
