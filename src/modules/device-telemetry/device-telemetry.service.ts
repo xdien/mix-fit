@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
 
-import { WebsocketService } from '../../websocket/websocket.service';
+import { SocketService } from '../../websocket/websocket.service';
 import type { ITelemetryPayload } from '../device-telemetry/telemetry.types';
 import type { OilTemperatureEvent } from './dtos/temperature-event.dto';
 import { DeviceTelemetryEntity } from './enties/device-telemetry.entity';
@@ -14,7 +14,7 @@ export class DeviceTelemetryService {
   constructor(
     @InjectRepository(DeviceTelemetryEntity)
     private telemetryRepo: Repository<DeviceTelemetryEntity>,
-    private websocketService: WebsocketService,
+    private websocketService: SocketService,
   ) {}
 
   async saveTelemetryBatch(payload: ITelemetryPayload): Promise<void> {
@@ -120,7 +120,10 @@ export class DeviceTelemetryService {
   pushDataToWebsocket(data: OilTemperatureEvent): Promise<void> {
     this.logger.log('Pushing data to websocket');
     this.logger.log(data);
-    this.websocketService.broadcastToChannel('sensor.temperature', data);
+    this.websocketService.broadcastToAuthenticatedUsers(
+      'oil_temperature',
+      data,
+    );
 
     return Promise.resolve();
   }

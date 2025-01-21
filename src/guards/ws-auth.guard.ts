@@ -2,11 +2,11 @@ import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import type { Observable } from 'rxjs';
 
-import { WebsocketService } from '../websocket/websocket.service';
+import { SocketService } from '../websocket/websocket.service';
 
 @Injectable()
 export class WsAuthGuard implements CanActivate {
-  constructor(private readonly websocketService: WebsocketService) {}
+  constructor(private readonly websocketService: SocketService) {}
 
   canActivate(
     context: ExecutionContext,

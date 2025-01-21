@@ -1,79 +1,40 @@
-// websocket/websocket.service.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { WebSocket } from 'ws';
+import type { Server, Socket } from 'socket.io';
 
 import type { IAuthPayload } from './interfaces/auth-payload.interface';
-import type { ISocketClient } from './interfaces/socket-client.interface';
 
 @Injectable()
-export class WebsocketService {
-  private readonly logger = new Logger(WebsocketService.name);
+export class SocketService {
+  private readonly logger = new Logger(SocketService.name);
 
-  private readonly clients = new Map<string, ISocketClient>();
-
-  private readonly channelSubscriptions = new Map<string, Set<string>>();
-
-  private readonly heartbeatInterval = 30_000;
-
-  private readonly heartbeatTimeout = 5000;
+  private io?: Server;
 
   constructor(private readonly jwtService: JwtService) {}
 
-  registerClient(client: WebSocket, payload: IAuthPayload): void {
-    const socketClient: ISocketClient = {
-      id: payload.userId,
-      token: payload.token,
-      lastHeartbeat: Date.now(),
-      isAlive: true,
-      ws: client,
-    };
-
-    this.clients.set(payload.userId, socketClient);
-    this.setupHeartbeat(client, payload.userId);
+  initializeSocket(server: Server) {
+    this.io = server;
   }
 
-  private setupHeartbeat(client: WebSocket, userId: string): void {
-    const interval = setInterval(() => {
-      const socketClient = this.clients.get(userId);
+  async handleConnection(client: Socket) {
+    try {
+      const token: string = client.handshake.auth.token as string;
+      const payload = await this.authenticateClient(token);
 
-      if (!socketClient?.isAlive) {
-        this.removeClient(userId);
-        clearInterval(interval);
+      // Store user data in socket
+      client.data.userId = payload.userId;
 
-        return;
-      }
+      void client.join(payload.userId);
 
-      socketClient.isAlive = false;
-      this.clients.set(userId, socketClient);
+      this.logger.log(`Client ${payload.userId} connected`);
+    } catch (error) {
+      client.disconnect();
+      this.logger.error(`Authentication failed: ${error.message}`);
+    }
+  }
 
-      client.ping();
-
-      setTimeout(() => {
-        const currentClient = this.clients.get(userId);
-
-        if (currentClient && !currentClient.isAlive) {
-          this.removeClient(userId);
-          clearInterval(interval);
-          client.close();
-        }
-      }, this.heartbeatTimeout);
-    }, this.heartbeatInterval);
-
-    client.on('pong', () => {
-      const socketClient = this.clients.get(userId);
-
-      if (socketClient) {
-        socketClient.isAlive = true;
-        socketClient.lastHeartbeat = Date.now();
-        this.clients.set(userId, socketClient);
-      }
-    });
-
-    client.on('close', () => {
-      clearInterval(interval);
-      this.removeClient(userId);
-    });
+  handleDisconnect(client: Socket) {
+    this.logger.log(`Client ${client.data.userId as string} disconnected`);
   }
 
   async authenticateClient(token: string): Promise<IAuthPayload> {
@@ -84,75 +45,12 @@ export class WebsocketService {
     }
   }
 
-  handlePong(userId: string): void {
-    const client = this.clients.get(userId);
-
-    if (client) {
-      client.isAlive = true;
-      client.lastHeartbeat = Date.now();
-      this.clients.set(userId, client);
-    }
+  broadcastToAuthenticatedUsers(event: string, message: unknown): void {
+    this.io?.emit(event, message);
   }
 
-  handlePing(userId: string): void {
-    const client = this.clients.get(userId);
-
-    if (client?.isAlive) {
-      client.ws.send(JSON.stringify({ type: 'pong' }));
-    }
-  }
-
-  removeClient(userId: string): void {
-    const client = this.clients.get(userId);
-
-    if (client?.ws) {
-      client.ws.close();
-    }
-
-    this.clients.delete(userId);
-    this.logger.log(`Client ${userId} removed`);
-  }
-
-  broadcastToAuthenticatedUsers(message: unknown): void {
-    for (const [, client] of this.clients) {
-      if (client.isAlive && client.ws.readyState === WebSocket.OPEN) {
-        client.ws.send(JSON.stringify(message));
-      }
-    }
-  }
-
-  subscribeToChannel(channelId: string, clientId: string) {
-    if (!this.channelSubscriptions.has(channelId)) {
-      this.channelSubscriptions.set(channelId, new Set());
-    }
-
-    this.channelSubscriptions.get(channelId)?.add(clientId);
-  }
-
-  unsubscribeFromChannel(channelId: string, clientId: string) {
-    const subscribers = this.channelSubscriptions.get(channelId);
-
-    if (subscribers) {
-      subscribers.delete(clientId);
-
-      if (subscribers.size === 0) {
-        this.channelSubscriptions.delete(channelId);
-      }
-    }
-  }
-
-  // Broadcast message to all clients subscribed to a channel
-  broadcastToChannel(channelId: string, message: unknown) {
-    const subscribers = this.channelSubscriptions.get(channelId);
-
-    if (subscribers) {
-      for (const clientId of subscribers) {
-        const client = this.clients.get(clientId);
-
-        if (client?.isAlive && client.ws.readyState === WebSocket.OPEN) {
-          client.ws.send(JSON.stringify(message));
-        }
-      }
-    }
+  // Broadcast to specific room/channel
+  broadcastToChannel(channelId: string, event: string, message: unknown) {
+    this.io?.to(channelId).emit(event, message);
   }
 }

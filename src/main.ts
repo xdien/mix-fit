@@ -9,7 +9,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import { WsAdapter } from '@nestjs/platform-ws';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import compression from 'compression';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -109,7 +109,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
   }
 
   const port = configService.appConfig.port;
-  app.useWebSocketAdapter(new WsAdapter(app));
+  app.useWebSocketAdapter(new IoAdapter(app));
   await app.listen(port);
 
   console.info(`server running on ${await app.getUrl()}`);

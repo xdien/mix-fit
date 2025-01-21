@@ -1,118 +1,38 @@
-// websocket/websocket.gateway.ts
-import { forwardRef, Inject, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import type {
   OnGatewayConnection,
   OnGatewayDisconnect,
-  OnGatewayInit,
 } from '@nestjs/websockets';
-import {
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
-import { Server, WebSocket } from 'ws';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import type { Socket } from 'socket.io';
+import { Server } from 'socket.io';
 
-// import { WsAuthGuard } from '../guards/ws-auth.guard';
-import type { IAuthPayload } from './interfaces/auth-payload.interface';
-import { WebsocketService } from './websocket.service';
+import { SocketService } from './websocket.service';
 
 @WebSocketGateway({
-  path: '/ws',
   cors: {
-    origin: '*',
+    origin: '*', // Configure according to your needs
   },
+  transports: ['websocket', 'polling'],
 })
-export class WebsocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
 
-  private logger: Logger = new Logger('WebsocketGateway');
+  readonly logger: Logger = new Logger(SocketGateway.name);
 
-  constructor(
-    @Inject(forwardRef(() => WebsocketService))
-    private readonly websocketService: WebsocketService,
-  ) {}
+  constructor(private readonly socketService: SocketService) {}
 
-  afterInit(_server: Server) {
-    this.logger.log('WebSocket Gateway initialized');
+  afterInit() {
+    this.logger.log('Socket Gateway initialized');
+    this.socketService.initializeSocket(this.server);
   }
 
-  //   @UseGuards(WsAuthGuard)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async handleConnection(client: WebSocket, ...args: unknown[]) {
-    try {
-      const headers = args[0];
-      const token = this.extractTokenFromHeader(
-        headers as { rawHeaders: string[] },
-      );
-      const payload: IAuthPayload =
-        await this.websocketService.authenticateClient(token);
-
-      this.websocketService.registerClient(client, {
-        token,
-        userId: payload.userId,
-      });
-
-      client.send(
-        JSON.stringify({
-          type: 'connection',
-          status: 'authenticated',
-        }),
-      );
-    } catch {
-      client.send(
-        JSON.stringify({
-          type: 'error',
-          message: 'Authentication failed',
-        }),
-      );
-      client.close();
-    }
+  async handleConnection(client: Socket) {
+    await this.socketService.handleConnection(client);
   }
 
-  handleDisconnect(_client: WebSocket) {
-    this.logger.log('Client disconnected');
-  }
-
-  @SubscribeMessage('ping')
-  handlePing(client: WebSocket, userId: string): void {
-    Logger.log(`Received ping from ${client.eventNames()} ${userId}`);
-  }
-
-  @SubscribeMessage('pong')
-  handlePong(client: WebSocket, userId: string): void {
-    this.logger.log(`Received pong from ${client.eventNames()}`);
-    // Logger.log(`Received pong from ${client.eventNames()}`);
-    this.websocketService.handlePong(userId);
-  }
-
-  private extractTokenFromHeader(headers: { rawHeaders: string[] }): string {
-    const arrayHeaders = headers.rawHeaders;
-
-    if (arrayHeaders.length > 0) {
-      const authIndex = arrayHeaders.findIndex(
-        (h: string) => h.toLowerCase() === 'authorization',
-      );
-
-      if (authIndex >= 0) {
-        const authHeader = headers.rawHeaders[authIndex + 1];
-
-        if (!authHeader) {
-          throw new Error('No authorization header');
-        }
-
-        const [type, token] = authHeader.split(' ');
-
-        if (type !== 'Bearer' || !token) {
-          throw new Error('Invalid token type');
-        }
-
-        return token;
-      }
-    }
-
-    throw new Error('No authorization header');
+  handleDisconnect(client: Socket) {
+    this.socketService.handleDisconnect(client);
   }
 }

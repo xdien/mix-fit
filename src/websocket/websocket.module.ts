@@ -3,8 +3,8 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { WsAuthGuard } from '../guards/ws-auth.guard';
 import { ApiConfigService } from '../shared/services/api-config.service';
-import { WebsocketGateway } from './websocket.gateway';
-import { WebsocketService } from './websocket.service';
+import { SocketGateway } from './websocket.gateway';
+import { SocketService } from './websocket.service';
 
 @Module({
   imports: [
@@ -27,7 +27,7 @@ import { WebsocketService } from './websocket.service';
       inject: [ApiConfigService],
     }),
   ],
-  providers: [WebsocketGateway, WebsocketService, WsAuthGuard],
-  exports: [WebsocketService],
+  providers: [SocketGateway, SocketService, WsAuthGuard],
+  exports: [SocketService],
 })
 export class WebsocketModule {}
