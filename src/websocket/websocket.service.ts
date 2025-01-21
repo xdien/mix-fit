@@ -47,7 +47,7 @@ export class WebsocketService {
       socketClient.isAlive = false;
       this.clients.set(userId, socketClient);
 
-      client.send(JSON.stringify({ type: 'ping' }));
+      client.ping();
 
       setTimeout(() => {
         const currentClient = this.clients.get(userId);
@@ -59,6 +59,16 @@ export class WebsocketService {
         }
       }, this.heartbeatTimeout);
     }, this.heartbeatInterval);
+
+    client.on('pong', () => {
+      const socketClient = this.clients.get(userId);
+
+      if (socketClient) {
+        socketClient.isAlive = true;
+        socketClient.lastHeartbeat = Date.now();
+        this.clients.set(userId, socketClient);
+      }
+    });
 
     client.on('close', () => {
       clearInterval(interval);
