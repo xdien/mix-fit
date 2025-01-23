@@ -5,6 +5,8 @@ import type { MqttClient } from 'mqtt';
 import mqttConnect from 'mqtt';
 import { lastValueFrom } from 'rxjs';
 
+import { MqttJsonDeserializer } from '../common/mqtt-json.deserializer';
+import { MqttJsonSerializer } from '../common/mqtt-json.serializer';
 import { ApiConfigService } from '../shared/services/api-config.service';
 import type { IMqttCommandPayload } from './mqtt.types';
 
@@ -31,6 +33,8 @@ export class MqttService {
         url,
         username: mqttConfig.username,
         password: mqttConfig.password,
+        deserializer: new MqttJsonDeserializer(),
+        serializer: new MqttJsonSerializer(),
       },
     });
   }

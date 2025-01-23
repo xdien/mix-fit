@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/prefer-top-level-await */
+
 import {
   ClassSerializerInterceptor,
   HttpStatus,
@@ -16,6 +17,8 @@ import morgan from 'morgan';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
 import { AppModule } from './app.module';
+import { MqttJsonDeserializer } from './common/mqtt-json.deserializer';
+import { MqttJsonSerializer } from './common/mqtt-json.serializer';
 import { HttpExceptionFilter } from './filters/bad-request.filter';
 import { QueryFailedFilter } from './filters/query-failed.filter';
 import { TranslationInterceptor } from './interceptors/translation-interceptor.service';
@@ -94,6 +97,8 @@ export async function bootstrap(): Promise<NestExpressApplication> {
         username: mqttConfig.username,
         password: mqttConfig.password,
       },
+      deserializer: new MqttJsonDeserializer(),
+      serializer: new MqttJsonSerializer(),
     });
     await app.startAllMicroservices();
   }

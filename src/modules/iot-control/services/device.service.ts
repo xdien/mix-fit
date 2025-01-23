@@ -18,4 +18,9 @@ export class DeviceService {
   async findById(deviceId: string): Promise<DeviceEntity | null> {
     return this.deviceRepository.findOne({ where: { deviceId } });
   }
+
+  // update online status
+  async updateOnlineStatus(deviceId: string, online: boolean): Promise<void> {
+    await this.deviceRepository.update({ deviceId }, { online });
+  }
 }

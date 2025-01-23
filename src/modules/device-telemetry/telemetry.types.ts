@@ -23,7 +23,7 @@ export interface IMetric {
 }
 
 export interface ITelemetryPayload {
-  device_id: string;
+  deviceId: string;
   timestamp?: Date;
   metrics: IMetric[];
 }

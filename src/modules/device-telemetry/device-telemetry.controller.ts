@@ -18,27 +18,30 @@ import {
 
 import { RoleType } from '../../constants';
 import { Auth } from '../../decorators';
+import { IoTEvents, SensorDataEventDto } from '../../modules/iot/iot.events';
 import { DeviceTelemetryService } from './device-telemetry.service';
-import { TelemetryPayloadDto } from './dtos/telemetry.dto';
+import { MetricDto, TelemetryPayloadDto } from './dtos/telemetry.dto';
 import { OilTemperatureEvent } from './dtos/temperature-event.dto';
-import type {
-  IMetric,
-  IMetricWithMetadata,
-  ITelemetryPayload,
-  Metadata,
-  MetadataValue,
-  MetricValue,
-} from './telemetry.types';
 
-interface ITelemetryMessage {
-  timestamp?: string;
-  metadata?: Record<string, unknown>;
-  [key: string]: unknown; // Cho phép các field động
-}
+// @Injectable()
+// export class ParseTelemetryPipe
+//   implements PipeTransform<unknown, TelemetryPayloadDto>
+// {
+//   transform(value: unknown): TelemetryPayloadDto {
+//     if (typeof value !== 'string') {
+//       throw new BadRequestException('Invalid payload format');
+//     }
+
+//     const parsed = JSON.parse(value);
+
+//     // Add validation logic here if needed
+//     return parsed as TelemetryPayloadDto;
+//   }
+// }
 
 @Controller('telemetry')
 @ApiTags('Telemetry')
-@ApiExtraModels(OilTemperatureEvent)
+@ApiExtraModels(OilTemperatureEvent, SensorDataEventDto, MetricDto)
 export class DeviceTelemetryController {
   private readonly logger = new Logger(DeviceTelemetryController.name);
 
@@ -100,105 +103,13 @@ export class DeviceTelemetryController {
     );
   }
 
-  private transformToTelemetryPayload(
-    deviceId: string,
-    data: ITelemetryMessage,
-  ): ITelemetryPayload {
-    const timestamp =
-      data.timestamp == null ? new Date() : new Date(data.timestamp);
-    const globalMetadata: Metadata = this.sanitizeMetadata(data.metadata ?? {});
-
-    const dataClone = { ...data };
-    delete dataClone.metadata;
-    delete dataClone.timestamp;
-
-    const metrics = Object.entries(dataClone).map(([key, value]): IMetric => {
-      let processedValue: MetricValue = value as MetricValue;
-      let metadata: Metadata = { ...globalMetadata };
-
-      if (this.isMetricWithMetadata(value)) {
-        processedValue = value.value;
-
-        if (value.metadata) {
-          // Sanitize và merge metadata
-          const sanitizedMetadata = this.sanitizeMetadata(value.metadata);
-          metadata = { ...metadata, ...sanitizedMetadata };
-        }
-      }
-
-      return {
-        name: key,
-        value: processedValue,
-        metadata,
-      };
-    });
-
-    return {
-      device_id: deviceId,
-      timestamp,
-      metrics,
-    };
-  }
-
-  private isUrlObject(obj: unknown): obj is { url: string } {
-    return (
-      typeof obj === 'object' &&
-      obj !== null &&
-      'url' in obj &&
-      typeof (obj as { url: unknown }).url === 'string'
-    );
-  }
-
-  private isValidMetricValue(value: unknown): value is MetricValue {
-    if (
-      typeof value === 'number' ||
-      typeof value === 'string' ||
-      typeof value === 'boolean'
-    ) {
-      return true;
-    }
-
-    return this.isUrlObject(value);
-  }
-
-  private isMetricWithMetadata(value: unknown): value is IMetricWithMetadata {
-    if (typeof value !== 'object' || value === null) {
-      return false;
-    }
-
-    const candidate = value as Record<string, unknown>;
-
-    if (!('value' in candidate)) {
-      return false;
-    }
-
-    return this.isValidMetricValue(candidate.value);
-  }
-
-  private sanitizeMetadata(data: Record<string, unknown>): Metadata {
-    const sanitized: Metadata = {};
-
-    for (const [key, value] of Object.entries(data)) {
-      sanitized[key] =
-        value === null ||
-        value === undefined ||
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean'
-          ? (value as MetadataValue)
-          : JSON.stringify(value);
-    }
-
-    return sanitized;
-  }
-
   @EventPattern('devices/+/telemetry')
   //   @Auth([RoleType.USER])
   async handleTelemetryEvent(
-    @Payload() message: ITelemetryMessage,
+    @Payload() message: TelemetryPayloadDto,
     @Ctx() context: MqttContext,
   ) {
-    this.logger.debug(`Received telemetry data: ${JSON.stringify(message)}`);
+    this.logger.debug(`Received telemetry data: ${typeof message}`);
 
     try {
       const deviceId = context.getTopic().split('/')[1];
@@ -207,22 +118,17 @@ export class DeviceTelemetryController {
         throw new Error('Device ID not found in topic');
       }
 
-      const telemetryData = this.transformToTelemetryPayload(deviceId, message);
-      await this.telemetryService.saveTelemetryBatch(telemetryData);
-      const temperatureCloudevent = {
-        specversion: '1.0',
-        type: 'temperature',
-        source: 'device/1',
-        id: 'A234-1234-1234',
-        time: new Date().toISOString(),
-        datacontenttype: 'application/json',
-        data: {
-          temperature: telemetryData.metrics[0]?.value as number,
-          deviceId: 'device-1',
+      await this.telemetryService.saveTelemetryBatch(message);
+      // convert to broadcast event
+      const temperatureCloudevent: SensorDataEventDto = {
+        telemetryData: {
+          deviceId,
           timestamp: new Date(),
+          metrics: message.metrics,
         },
+        eventType: IoTEvents.SENSOR_DATA_MONITORING,
       };
-      await this.telemetryService.pushDataToWebsocket(temperatureCloudevent);
+      this.telemetryService.broadcastToMonitor(temperatureCloudevent);
     } catch (error) {
       if (error instanceof Error) {
         this.logger.error(

@@ -10,7 +10,6 @@ import { IoTCommandControllerV1 } from './controllers/command-v1.controller';
 import { DeviceEntity } from './entities/device.entity';
 import { CommandLogEntity } from './entities/device-command.entity';
 import { IotControlController } from './iot-control.controller';
-import { IotControlService } from './iot-control.service';
 import { IoTCommandService } from './services/command.service';
 import { IoTCommandV1Service } from './services/command-v1.service';
 import { DeviceService } from './services/device.service';
@@ -28,7 +27,6 @@ import { DeviceService } from './services/device.service';
     IoTCommandControllerV1,
   ],
   exports: [
-    IotControlService,
     IoTCommandService,
     IoTCommandV1Service,
     CommandFactory,
@@ -36,7 +34,6 @@ import { DeviceService } from './services/device.service';
     DeviceService,
   ],
   providers: [
-    IotControlService,
     IoTCommandService,
     IoTCommandV1Service,
     CommandFactory,

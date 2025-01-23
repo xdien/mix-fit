@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import type { SensorDataEventDto } from 'modules/iot/iot.events';
 import type { Server, Socket } from 'socket.io';
 
+import { IoTEvents } from '../modules/iot/iot.events';
 import type { IAuthPayload } from './interfaces/auth-payload.interface';
 
 @Injectable()
@@ -49,8 +51,24 @@ export class SocketService {
     this.io?.emit(event, message);
   }
 
+  // Broadcast to broadcast room with event SensorDataEventDto
+  broadcastToMonitor(data: SensorDataEventDto) {
+    this.logger.log(
+      `Broadcasting to monitoring deviceId: ${data.telemetryData.deviceId}`,
+    );
+    this.io?.emit(
+      IoTEvents.SENSOR_DATA_MONITORING + '/' + data.telemetryData.deviceId,
+      data,
+    );
+  }
+
   // Broadcast to specific room/channel
   broadcastToChannel(channelId: string, event: string, message: unknown) {
     this.io?.to(channelId).emit(event, message);
+  }
+
+  // Emit to specific client
+  emitToClient(clientId: string, event: string, message: unknown) {
+    this.io?.to(clientId).emit(event, message);
   }
 }
