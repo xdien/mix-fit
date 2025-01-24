@@ -54,7 +54,7 @@ export class ControlCommandEventDto extends IoTEventDto {
     description: 'Command parameters',
     example: { targetTemp: 23, fanSpeed: 'high' },
   })
-  parameters!: Record<string, any>;
+  parameters!: Record<string, unknown>;
 
   @ApiProperty({
     description: 'Command priority',

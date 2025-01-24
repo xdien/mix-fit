@@ -18,7 +18,11 @@ import {
 
 import { RoleType } from '../../constants';
 import { Auth } from '../../decorators';
-import { IoTEvents, SensorDataEventDto } from '../../modules/iot/iot.events';
+import {
+  DeviceStatusEventDto,
+  IoTEvents,
+  SensorDataEventDto,
+} from '../../modules/iot/iot.events';
 import { DeviceTelemetryService } from './device-telemetry.service';
 import { MetricDto, TelemetryPayloadDto } from './dtos/telemetry.dto';
 import { OilTemperatureEvent } from './dtos/temperature-event.dto';
@@ -41,7 +45,12 @@ import { OilTemperatureEvent } from './dtos/temperature-event.dto';
 
 @Controller('telemetry')
 @ApiTags('Telemetry')
-@ApiExtraModels(OilTemperatureEvent, SensorDataEventDto, MetricDto)
+@ApiExtraModels(
+  OilTemperatureEvent,
+  SensorDataEventDto,
+  MetricDto,
+  DeviceStatusEventDto,
+)
 export class DeviceTelemetryController {
   private readonly logger = new Logger(DeviceTelemetryController.name);
 
