@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsNotEmpty, IsObject, IsString } from 'class-validator';
 
 import type { ICommandPayload } from '../commands/iot-command.interface';
 
@@ -19,6 +20,15 @@ export class CommandPayloadDto implements Omit<ICommandPayload, 'deviceId'> {
     type: 'object',
     additionalProperties: true,
   })
+  @IsObject()
+  @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      return JSON.parse(value);
+    }
+
+    return value;
+  })
+  @Type(() => Object)
   parameters?: Record<string, unknown>;
 
   @ApiProperty({

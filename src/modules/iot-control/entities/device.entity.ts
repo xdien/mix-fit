@@ -16,7 +16,9 @@ export class DeviceEntity extends AbstractEntity<DeviceDto> {
   @PrimaryColumn()
   deviceId!: string;
 
-  @ManyToOne(() => UserEntity, (user: UserEntity) => user.devices)
+  @ManyToOne(() => UserEntity, (user: UserEntity) => user.devices, {
+    eager: true,
+  })
   owner!: UserEntity;
 
   @StringFieldOptional({ nullable: false })
@@ -33,4 +35,8 @@ export class DeviceEntity extends AbstractEntity<DeviceDto> {
 
   @ManyToOne(() => DeviceTypeEntity, (deviceType) => deviceType.devices)
   deviceType!: DeviceTypeEntity;
+
+  toDto(options?: undefined): DeviceDto {
+    return new DeviceDto(this, options);
+  }
 }

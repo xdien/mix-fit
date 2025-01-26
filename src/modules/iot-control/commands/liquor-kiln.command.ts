@@ -3,6 +3,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 
+import { DeviceCommandType } from '../../../constants/device-command-type';
 import { MqttService } from '../../../mqtt/mqtt.service';
 import type { CommandLogEntity } from '../entities/device-command.entity';
 import { BaseCommand } from './base.command';
@@ -15,14 +16,23 @@ enum CommandAction {
   HEATER_3 = 2,
   SET_OVERHEAT_TEMP = 3,
   SET_COOLING_TEMP = 4,
-  SET_DISTILLATION_TEMP = 5,
   SET_DISTILLATION_TIME = 6,
   RESET_WIFI = 7,
+  SET_DISTILLATION_DAY_TEMP_MIN = 8,
+  SET_DISTILLATION_DAY_TEMP_MAX = 9,
+  SET_DISTILLATION_NIGHT_TEMP_MIN = 10,
+  SET_DISTILLATION_NIGHT_TEMP_MAX = 11,
+  UPDATE_TIME_NTP = 12,
+  SET_TOTAL_DAY_DISTILLATION_TIME,
+  SET_TOTAL_NIGHT_DISTILLATION_TIME,
+  CMD_HEATER_1,
+  CMD_HEATER_2,
+  CMD_HEATER_SYS,
 }
 
 @Injectable()
 export class LiquorKilnCommand extends BaseCommand {
-  private static readonly BUFFER_SIZE = 4;
+  private static readonly BUFFER_SIZE = 11;
 
   private readonly logger = new Logger(LiquorKilnCommand.name);
 
@@ -52,10 +62,10 @@ export class LiquorKilnCommand extends BaseCommand {
   private prepareCommandEntity(): CommandLogEntity {
     return {
       deviceId: this.deviceId,
-      deviceType: 'LIQUOR-KILN',
+      deviceType: DeviceCommandType.LIQUOR_KILN,
       status: CommandStatus.PENDING,
       payload: {
-        deviceType: 'LIQUOR-KILN',
+        deviceType: this.payload.deviceType,
         parameters: this.payload.parameters,
         deviceId: this.deviceId,
       },
@@ -120,15 +130,11 @@ export class LiquorKilnCommand extends BaseCommand {
     const buffer = Buffer.alloc(this.BUFFER_SIZE);
 
     // Pack action (2 bits), reserved (2 bits), and high bits of value (4 bits)
-    const firstByte =
-      ((action & 0x03) << 6) | // Action - 2 bits
-      ((0x00 & 0x03) << 4) | // Reserved - 2 bits
-      ((value >> 8) & 0x0f); // Value high - 4 bits
+    buffer[0] = action & 0xff; // 8 bit action
 
-    buffer[0] = firstByte;
-    buffer[1] = value & 0xff; // Value low - 8 bits
+    buffer.writeDoubleLE(value, 1); // 8 byte double value
 
-    const checksum = this.calculateChecksum(buffer.subarray(0, 2));
+    const checksum = this.calculateChecksum(buffer.subarray(0, 9));
     buffer.writeUInt16BE(checksum, 2);
 
     return buffer;
@@ -168,10 +174,6 @@ export class LiquorKilnCommand extends BaseCommand {
 
       case 'SET_COOLING_TEMP': {
         return CommandAction.SET_COOLING_TEMP;
-      }
-
-      case 'SET_DISTILLATION_TEMP': {
-        return CommandAction.SET_DISTILLATION_TEMP;
       }
 
       case 'SET_DISTILLATION_TIME': {

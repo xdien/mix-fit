@@ -118,7 +118,7 @@ export class DeviceTelemetryController {
     @Payload() message: TelemetryPayloadDto,
     @Ctx() context: MqttContext,
   ) {
-    this.logger.debug(`Received telemetry data: ${typeof message}`);
+    this.logger.debug(`Received telemetry data: ${JSON.stringify(message)}`);
 
     try {
       const deviceId = context.getTopic().split('/')[1];
@@ -127,7 +127,14 @@ export class DeviceTelemetryController {
         throw new Error('Device ID not found in topic');
       }
 
-      await this.telemetryService.saveTelemetryBatch(message);
+      if (deviceId === 'esp8266_001') {
+        // only process telemetry data from specific device
+        const dataEvent = this.transformTelemetryPayload(message);
+        await this.telemetryService.saveTelemetryBatch(dataEvent);
+      } else {
+        await this.telemetryService.saveTelemetryBatch(message);
+      }
+
       // convert to broadcast event
       const temperatureCloudevent: SensorDataEventDto = {
         telemetryData: {
@@ -148,5 +155,65 @@ export class DeviceTelemetryController {
 
       throw error;
     }
+  }
+
+  transformTelemetryPayload(payload: any): TelemetryPayloadDto {
+    const metrics: MetricDto[] = [
+      {
+        sensorId: payload.idNau,
+        name: 'current',
+        value: payload.a,
+        unit: 'ampere',
+        metadata: { type: 'electrical' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'power',
+        value: payload.w,
+        unit: 'watt',
+        metadata: { type: 'electrical' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'voltage',
+        value: payload.v,
+        unit: 'volt',
+        metadata: { type: 'electrical' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'frequency',
+        value: payload.f,
+        unit: 'hertz',
+        metadata: { type: 'electrical' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'kilowatt_hour',
+        value: payload.kw,
+        unit: 'kWh',
+        metadata: { type: 'energy' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'oil_temperature',
+        value: payload.tDau,
+        unit: 'celsius',
+        metadata: { type: 'temperature' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'water_temperature',
+        value: payload.tNuoc,
+        unit: 'celsius',
+        metadata: { type: 'temperature' },
+      },
+    ];
+
+    return {
+      deviceId: payload.device_id,
+      timestamp: new Date(Number.parseInt(payload.tm) * 1000), // Assuming timestamp is in seconds
+      metrics,
+    };
   }
 }
