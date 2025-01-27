@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/prefer-top-level-await */
+
 import {
   ClassSerializerInterceptor,
   HttpStatus,
@@ -9,12 +10,15 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import compression from 'compression';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 
 import { AppModule } from './app.module';
+import { MqttJsonDeserializer } from './common/mqtt-json.deserializer';
+import { MqttJsonSerializer } from './common/mqtt-json.serializer';
 import { HttpExceptionFilter } from './filters/bad-request.filter';
 import { QueryFailedFilter } from './filters/query-failed.filter';
 import { TranslationInterceptor } from './interceptors/translation-interceptor.service';
@@ -93,6 +97,8 @@ export async function bootstrap(): Promise<NestExpressApplication> {
         username: mqttConfig.username,
         password: mqttConfig.password,
       },
+      deserializer: new MqttJsonDeserializer(),
+      serializer: new MqttJsonSerializer(),
     });
     await app.startAllMicroservices();
   }
@@ -108,6 +114,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
   }
 
   const port = configService.appConfig.port;
+  app.useWebSocketAdapter(new IoAdapter(app));
   await app.listen(port);
 
   console.info(`server running on ${await app.getUrl()}`);

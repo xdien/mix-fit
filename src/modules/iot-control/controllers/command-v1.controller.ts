@@ -20,7 +20,7 @@ import { IoTCommandV1Service } from '../services/command-v1.service';
 
 @Controller('/v1/iot/commands')
 @ApiTags('IoT Commands')
-export class IoTCommandControllerV1 {
+export class IoTCommandV1Controller {
   //   private readonly _logger = new Logger(IoTCommandController.name);
 
   constructor(private readonly commandService: IoTCommandV1Service) {}

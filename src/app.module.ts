@@ -13,7 +13,6 @@ import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 
 import { AuthModule } from './modules/auth/auth.module';
-import { EventsGateway } from './modules/chat/events-gateway';
 import { CmsAuthModule } from './modules/cms-auth/cms-auth.module';
 import { DeviceTelemetryModule } from './modules/device-telemetry/device-telemetry.module';
 import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
@@ -25,6 +24,7 @@ import { UserModule } from './modules/user/user.module';
 import { MqttModule } from './mqtt/mqtt.module';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { SharedModule } from './shared/shared.module';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [
@@ -114,6 +114,7 @@ import { SharedModule } from './shared/shared.module';
         };
       },
     }),
+    WebsocketModule,
     HealthCheckerModule,
     MqttModule,
     IotModule,
@@ -122,7 +123,7 @@ import { SharedModule } from './shared/shared.module';
     IotControlModule,
     DeviceTelemetryModule,
   ],
-  providers: [EventsGateway],
+  providers: [],
   controllers: [],
 })
 export class AppModule {}

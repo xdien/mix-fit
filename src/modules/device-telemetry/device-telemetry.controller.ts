@@ -9,29 +9,48 @@ import {
   Query,
 } from '@nestjs/common';
 import { Ctx, EventPattern, MqttContext, Payload } from '@nestjs/microservices';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { RoleType } from '../../constants';
 import { Auth } from '../../decorators';
+import {
+  DeviceStatusEventDto,
+  IoTEvents,
+  SensorDataEventDto,
+} from '../../modules/iot/iot.events';
 import { DeviceTelemetryService } from './device-telemetry.service';
-import { TelemetryPayloadDto } from './dtos/telemetry.dto';
-import type {
-  IMetric,
-  IMetricWithMetadata,
-  ITelemetryPayload,
-  Metadata,
-  MetadataValue,
-  MetricValue,
-} from './telemetry.types';
+import { MetricDto, TelemetryPayloadDto } from './dtos/telemetry.dto';
+import { OilTemperatureEvent } from './dtos/temperature-event.dto';
 
-interface ITelemetryMessage {
-  timestamp?: string;
-  metadata?: Record<string, unknown>;
-  [key: string]: unknown; // Cho phép các field động
-}
+// @Injectable()
+// export class ParseTelemetryPipe
+//   implements PipeTransform<unknown, TelemetryPayloadDto>
+// {
+//   transform(value: unknown): TelemetryPayloadDto {
+//     if (typeof value !== 'string') {
+//       throw new BadRequestException('Invalid payload format');
+//     }
+
+//     const parsed = JSON.parse(value);
+
+//     // Add validation logic here if needed
+//     return parsed as TelemetryPayloadDto;
+//   }
+// }
 
 @Controller('telemetry')
 @ApiTags('Telemetry')
+@ApiExtraModels(
+  OilTemperatureEvent,
+  SensorDataEventDto,
+  MetricDto,
+  DeviceStatusEventDto,
+)
 export class DeviceTelemetryController {
   private readonly logger = new Logger(DeviceTelemetryController.name);
 
@@ -93,102 +112,10 @@ export class DeviceTelemetryController {
     );
   }
 
-  private transformToTelemetryPayload(
-    deviceId: string,
-    data: ITelemetryMessage,
-  ): ITelemetryPayload {
-    const timestamp =
-      data.timestamp == null ? new Date() : new Date(data.timestamp);
-    const globalMetadata: Metadata = this.sanitizeMetadata(data.metadata ?? {});
-
-    const dataClone = { ...data };
-    delete dataClone.metadata;
-    delete dataClone.timestamp;
-
-    const metrics = Object.entries(dataClone).map(([key, value]): IMetric => {
-      let processedValue: MetricValue = value as MetricValue;
-      let metadata: Metadata = { ...globalMetadata };
-
-      if (this.isMetricWithMetadata(value)) {
-        processedValue = value.value;
-
-        if (value.metadata) {
-          // Sanitize và merge metadata
-          const sanitizedMetadata = this.sanitizeMetadata(value.metadata);
-          metadata = { ...metadata, ...sanitizedMetadata };
-        }
-      }
-
-      return {
-        name: key,
-        value: processedValue,
-        metadata,
-      };
-    });
-
-    return {
-      device_id: deviceId,
-      timestamp,
-      metrics,
-    };
-  }
-
-  private isUrlObject(obj: unknown): obj is { url: string } {
-    return (
-      typeof obj === 'object' &&
-      obj !== null &&
-      'url' in obj &&
-      typeof (obj as { url: unknown }).url === 'string'
-    );
-  }
-
-  private isValidMetricValue(value: unknown): value is MetricValue {
-    if (
-      typeof value === 'number' ||
-      typeof value === 'string' ||
-      typeof value === 'boolean'
-    ) {
-      return true;
-    }
-
-    return this.isUrlObject(value);
-  }
-
-  private isMetricWithMetadata(value: unknown): value is IMetricWithMetadata {
-    if (typeof value !== 'object' || value === null) {
-      return false;
-    }
-
-    const candidate = value as Record<string, unknown>;
-
-    if (!('value' in candidate)) {
-      return false;
-    }
-
-    return this.isValidMetricValue(candidate.value);
-  }
-
-  private sanitizeMetadata(data: Record<string, unknown>): Metadata {
-    const sanitized: Metadata = {};
-
-    for (const [key, value] of Object.entries(data)) {
-      sanitized[key] =
-        value === null ||
-        value === undefined ||
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean'
-          ? (value as MetadataValue)
-          : JSON.stringify(value);
-    }
-
-    return sanitized;
-  }
-
   @EventPattern('devices/+/telemetry')
   //   @Auth([RoleType.USER])
   async handleTelemetryEvent(
-    @Payload() message: ITelemetryMessage,
+    @Payload() message: TelemetryPayloadDto,
     @Ctx() context: MqttContext,
   ) {
     this.logger.debug(`Received telemetry data: ${JSON.stringify(message)}`);
@@ -200,8 +127,24 @@ export class DeviceTelemetryController {
         throw new Error('Device ID not found in topic');
       }
 
-      const telemetryData = this.transformToTelemetryPayload(deviceId, message);
-      await this.telemetryService.saveTelemetryBatch(telemetryData);
+      if (deviceId === 'esp8266_001') {
+        // only process telemetry data from specific device
+        const dataEvent = this.transformTelemetryPayload(message);
+        await this.telemetryService.saveTelemetryBatch(dataEvent);
+      } else {
+        await this.telemetryService.saveTelemetryBatch(message);
+      }
+
+      // convert to broadcast event
+      const temperatureCloudevent: SensorDataEventDto = {
+        telemetryData: {
+          deviceId,
+          timestamp: new Date(),
+          metrics: message.metrics,
+        },
+        eventType: IoTEvents.SENSOR_DATA_MONITORING,
+      };
+      this.telemetryService.broadcastToMonitor(temperatureCloudevent);
     } catch (error) {
       if (error instanceof Error) {
         this.logger.error(
@@ -212,5 +155,65 @@ export class DeviceTelemetryController {
 
       throw error;
     }
+  }
+
+  transformTelemetryPayload(payload: any): TelemetryPayloadDto {
+    const metrics: MetricDto[] = [
+      {
+        sensorId: payload.idNau,
+        name: 'current',
+        value: payload.a,
+        unit: 'ampere',
+        metadata: { type: 'electrical' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'power',
+        value: payload.w,
+        unit: 'watt',
+        metadata: { type: 'electrical' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'voltage',
+        value: payload.v,
+        unit: 'volt',
+        metadata: { type: 'electrical' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'frequency',
+        value: payload.f,
+        unit: 'hertz',
+        metadata: { type: 'electrical' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'kilowatt_hour',
+        value: payload.kw,
+        unit: 'kWh',
+        metadata: { type: 'energy' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'oil_temperature',
+        value: payload.tDau,
+        unit: 'celsius',
+        metadata: { type: 'temperature' },
+      },
+      {
+        sensorId: payload.idNau,
+        name: 'water_temperature',
+        value: payload.tNuoc,
+        unit: 'celsius',
+        metadata: { type: 'temperature' },
+      },
+    ];
+
+    return {
+      deviceId: payload.device_id,
+      timestamp: new Date(Number.parseInt(payload.tm) * 1000), // Assuming timestamp is in seconds
+      metrics,
+    };
   }
 }
