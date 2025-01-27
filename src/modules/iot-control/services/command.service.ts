@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 // import type { BaseCommand } from '../commands/base.command';
 import type { ICommandResponse } from '../commands/iot-command.interface';
 import type { CommandPayloadDto } from '../dto/command-payload.dto';
+import type { CommandResponseDto } from '../dto/command-response.dto';
 import { DeviceEntity } from '../entities/device.entity';
 
 @Injectable()
@@ -22,7 +23,7 @@ export class IoTCommandService {
   async executeCommand(
     deviceId: string,
     payload: CommandPayloadDto,
-  ): Promise<ICommandResponse> {
+  ): Promise<CommandResponseDto> {
     this.logger.debug('Finding device', deviceId);
     const device = await this.deviceRepository.findOne({
       where: { deviceId },
