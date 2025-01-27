@@ -63,7 +63,9 @@ export class LiquorKilnCommand extends BaseCommand {
       const commandData = this.prepareCommandEntity();
       const command = await this.repository.save(commandData);
 
-      const [action] = Object.keys(this.payload.parameters ?? {});
+      const action = Object.entries(this.payload.parameters ?? {}).find(
+        ([_, value]) => value !== null,
+      )?.[0];
 
       if (!this.payload.parameters) {
         throw new Error('Parameters are undefined');
