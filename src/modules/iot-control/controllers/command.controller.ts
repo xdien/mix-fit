@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -16,12 +17,15 @@ import {
 } from '@nestjs/swagger';
 
 import { AuthWithDeviceOwner } from '../../../guards/auth-with-device-owner.guard';
+import { DeviceTypeDto } from '../../../modules/iot/dtos/device-type.dto';
 import { CommandPayloadDto } from '../dto/command-payload.dto';
 import { CommandStatusDto } from '../dto/command-status.dto';
+import { LiquorKilnCommandActionDto } from '../dto/liquor-kiln-command.dto';
 import { IoTCommandService } from '../services/command.service';
 
 @Controller('iot/commands')
 @ApiTags('IoT Commands')
+@ApiExtraModels(LiquorKilnCommandActionDto, DeviceTypeDto)
 export class IoTCommandController {
   //   private readonly _logger = new Logger(IoTCommandController.name);
 
@@ -48,7 +52,7 @@ export class IoTCommandController {
   }
 
   @Get(':commandId/status')
-  //   @AuthWithDeviceOwner()
+  @AuthWithDeviceOwner()
   @ApiOperation({ summary: 'Get status of command' })
   @ApiParam({
     name: 'commandId',

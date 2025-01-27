@@ -14,8 +14,8 @@ export class CommandPayloadDto implements Omit<ICommandPayload, 'deviceId'> {
   deviceType!: string;
 
   @ApiProperty({
-    description: 'Các tham số bổ sung',
-    example: { temperature: 25, humidity: 80 },
+    description: 'Parameters control device',
+    example: { CMD_POWER_PUMP_WATER: true },
     required: false,
     type: 'object',
     additionalProperties: true,
