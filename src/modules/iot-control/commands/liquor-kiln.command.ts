@@ -28,6 +28,10 @@ enum CommandAction {
   CMD_HEATER_1,
   CMD_HEATER_2,
   CMD_HEATER_SYS,
+  TURN_ON_DAY_DISTILLATION,
+  TURN_ON_NIGHT_DISTILLATION,
+  TURN_OFF_DISTILLATION,
+  CMD_POWER_PUMP_WATER,
 }
 
 @Injectable()
@@ -128,23 +132,19 @@ export class LiquorKilnCommand extends BaseCommand {
 
   static packCommand(action: number, value: number): Buffer {
     const buffer = Buffer.alloc(this.BUFFER_SIZE);
-
-    // Pack action (2 bits), reserved (2 bits), and high bits of value (4 bits)
-    buffer[0] = action & 0xff; // 8 bit action
-
-    buffer.writeDoubleLE(value, 1); // 8 byte double value
-
+    buffer[0] = action & 0xff;
+    buffer.writeDoubleLE(value, 1); // Đổi sang LE (little-endian)
     const checksum = this.calculateChecksum(buffer.subarray(0, 9));
-    buffer.writeUInt16BE(checksum, 2);
+    buffer.writeUInt16LE(checksum, 9); // Checksum cũng phải LE
 
     return buffer;
   }
 
-  private static calculateChecksum(data: Buffer): number {
+  static calculateChecksum(buffer: Buffer): number {
     let crc = 0xff_ff;
 
-    for (const byte of data) {
-      crc ^= byte;
+    for (const element of buffer) {
+      crc ^= element;
 
       for (let j = 0; j < 8; j++) {
         crc = crc & 0x00_01 ? (crc >> 1) ^ 0xa0_01 : crc >> 1;
@@ -182,6 +182,62 @@ export class LiquorKilnCommand extends BaseCommand {
 
       case 'RESET_WIFI': {
         return CommandAction.RESET_WIFI;
+      }
+
+      case 'SET_DISTILLATION_DAY_TEMP_MIN': {
+        return CommandAction.SET_DISTILLATION_DAY_TEMP_MIN;
+      }
+
+      case 'SET_DISTILLATION_DAY_TEMP_MAX': {
+        return CommandAction.SET_DISTILLATION_DAY_TEMP_MAX;
+      }
+
+      case 'SET_DISTILLATION_NIGHT_TEMP_MIN': {
+        return CommandAction.SET_DISTILLATION_NIGHT_TEMP_MIN;
+      }
+
+      case 'SET_DISTILLATION_NIGHT_TEMP_MAX': {
+        return CommandAction.SET_DISTILLATION_NIGHT_TEMP_MAX;
+      }
+
+      case 'UPDATE_TIME_NTP': {
+        return CommandAction.UPDATE_TIME_NTP;
+      }
+
+      case 'SET_TOTAL_DAY_DISTILLATION_TIME': {
+        return CommandAction.SET_TOTAL_DAY_DISTILLATION_TIME;
+      }
+
+      case 'SET_TOTAL_NIGHT_DISTILLATION_TIME': {
+        return CommandAction.SET_TOTAL_NIGHT_DISTILLATION_TIME;
+      }
+
+      case 'CMD_HEATER_1': {
+        return CommandAction.CMD_HEATER_1;
+      }
+
+      case 'CMD_HEATER_2': {
+        return CommandAction.CMD_HEATER_2;
+      }
+
+      case 'CMD_HEATER_SYS': {
+        return CommandAction.CMD_HEATER_SYS;
+      }
+
+      case 'TURN_ON_DAY_DISTILLATION': {
+        return CommandAction.TURN_ON_DAY_DISTILLATION;
+      }
+
+      case 'TURN_ON_NIGHT_DISTILLATION': {
+        return CommandAction.TURN_ON_NIGHT_DISTILLATION;
+      }
+
+      case 'TURN_OFF_DISTILLATION': {
+        return CommandAction.TURN_OFF_DISTILLATION;
+      }
+
+      case 'CMD_POWER_PUMP_WATER': {
+        return CommandAction.CMD_POWER_PUMP_WATER;
       }
 
       default: {
