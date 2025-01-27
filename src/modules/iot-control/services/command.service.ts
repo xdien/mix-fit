@@ -34,6 +34,7 @@ export class IoTCommandService {
 
     const job = await this.commandQueue.add('iot-commands', {
       ...payload,
+      deviceId,
     });
 
     if (!job.id) {

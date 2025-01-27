@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import type { SensorDataEventDto } from 'modules/iot/iot.events';
 import { LessThan, Repository } from 'typeorm';
 
-import type { ITelemetryPayload } from '../device-telemetry/telemetry.types';
+import { SocketService } from '../../websocket/websocket.service';
+import type { TelemetryPayloadDto } from './dtos/telemetry.dto';
 import { DeviceTelemetryEntity } from './enties/device-telemetry.entity';
 
 @Injectable()
@@ -12,14 +14,15 @@ export class DeviceTelemetryService {
   constructor(
     @InjectRepository(DeviceTelemetryEntity)
     private telemetryRepo: Repository<DeviceTelemetryEntity>,
+    private websocketService: SocketService,
   ) {}
 
-  async saveTelemetryBatch(payload: ITelemetryPayload): Promise<void> {
+  async saveTelemetryBatch(payload: TelemetryPayloadDto): Promise<void> {
     const timestamp = payload.timestamp ?? new Date();
-
+    this.logger.log(typeof payload);
     const entities = payload.metrics.map((metric) => {
       const telemetry = new DeviceTelemetryEntity();
-      telemetry.deviceId = payload.device_id;
+      telemetry.deviceId = payload.deviceId;
       telemetry.time = timestamp;
       telemetry.metadata = metric.metadata ?? {};
       telemetry.setValue(metric.value);
@@ -30,11 +33,11 @@ export class DeviceTelemetryService {
     try {
       await this.telemetryRepo.save(entities);
       this.logger.log(
-        `Saved ${entities.length} metrics for device ${payload.device_id}`,
+        `Saved ${entities.length} metrics for device ${payload.deviceId}`,
       );
     } catch (error) {
       this.logger.error(
-        `Error saving telemetry for device ${payload.device_id}: ${(error as Error).message}`,
+        `Error saving telemetry for device ${payload.deviceId}: ${(error as Error).message}`,
       );
 
       throw error;
@@ -111,5 +114,13 @@ export class DeviceTelemetryService {
     });
 
     this.logger.log(`Deleted telemetry data older than ${retentionDays} days`);
+  }
+
+  // push data to monitoring dashboard
+  broadcastToMonitor(event: SensorDataEventDto): void {
+    this.logger.log(
+      `Broadcasting sensor data to monitoring dashboard ${JSON.stringify(event)}`,
+    );
+    this.websocketService.broadcastToMonitor(event);
   }
 }

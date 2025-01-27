@@ -1,7 +1,11 @@
 import { Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
 import { AbstractEntity } from '../../../common/abstract.entity';
-import { StringFieldOptional, UseDto } from '../../../decorators';
+import {
+  BooleanFieldOptional,
+  StringFieldOptional,
+  UseDto,
+} from '../../../decorators';
 import { UserEntity } from '../../user/user.entity';
 import { DeviceDto } from '../dto/device.dto';
 import { DeviceTypeEntity } from './device-types.entity';
@@ -12,7 +16,9 @@ export class DeviceEntity extends AbstractEntity<DeviceDto> {
   @PrimaryColumn()
   deviceId!: string;
 
-  @ManyToOne(() => UserEntity, (user: UserEntity) => user.devices)
+  @ManyToOne(() => UserEntity, (user: UserEntity) => user.devices, {
+    eager: true,
+  })
   owner!: UserEntity;
 
   @StringFieldOptional({ nullable: false })
@@ -24,6 +30,13 @@ export class DeviceEntity extends AbstractEntity<DeviceDto> {
   @StringFieldOptional({ nullable: true })
   model?: string;
 
+  @BooleanFieldOptional({ nullable: false, default: false })
+  online!: boolean;
+
   @ManyToOne(() => DeviceTypeEntity, (deviceType) => deviceType.devices)
   deviceType!: DeviceTypeEntity;
+
+  toDto(options?: undefined): DeviceDto {
+    return new DeviceDto(this, options);
+  }
 }
