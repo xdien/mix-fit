@@ -118,7 +118,7 @@ export class DeviceTelemetryController {
     @Payload() message: TelemetryPayloadDto,
     @Ctx() context: MqttContext,
   ) {
-    this.logger.debug(`Received telemetry data: ${JSON.stringify(message)}`);
+    // this.logger.debug(`Received telemetry data: ${JSON.stringify(message)}`);
 
     try {
       const deviceId = context.getTopic().split('/')[1];
@@ -127,23 +127,28 @@ export class DeviceTelemetryController {
         throw new Error('Device ID not found in topic');
       }
 
+      let temperatureCloudevent: SensorDataEventDto;
+
       if (deviceId === 'esp8266_001') {
         // only process telemetry data from specific device
         const dataEvent = this.transformTelemetryPayload(message);
         await this.telemetryService.saveTelemetryBatch(dataEvent);
+        temperatureCloudevent = {
+          telemetryData: dataEvent,
+          eventType: IoTEvents.SENSOR_DATA_MONITORING,
+        };
       } else {
         await this.telemetryService.saveTelemetryBatch(message);
+        temperatureCloudevent = {
+          telemetryData: {
+            deviceId,
+            timestamp: new Date(),
+            metrics: message.metrics,
+          },
+          eventType: IoTEvents.SENSOR_DATA_MONITORING,
+        };
       }
 
-      // convert to broadcast event
-      const temperatureCloudevent: SensorDataEventDto = {
-        telemetryData: {
-          deviceId,
-          timestamp: new Date(),
-          metrics: message.metrics,
-        },
-        eventType: IoTEvents.SENSOR_DATA_MONITORING,
-      };
       this.telemetryService.broadcastToMonitor(temperatureCloudevent);
     } catch (error) {
       if (error instanceof Error) {
