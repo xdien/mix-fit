@@ -5,34 +5,12 @@ import { Repository } from 'typeorm';
 
 import { DeviceCommandType } from '../../../constants/device-command-type';
 import { MqttService } from '../../../mqtt/mqtt.service';
+import { ACTION_MAPPING } from '../device-adapter/liquor-kiln-commnad.type';
+import type { LiquorKilnCommandEnum } from '../device-adapter/liquor-kiln-firmware.type';
 import type { CommandLogEntity } from '../entities/device-command.entity';
 import { BaseCommand } from './base.command';
 import { CommandStatus } from './iot-command.enums';
 import { ICommandPayload } from './iot-command.interface';
-
-enum CommandAction {
-  HEATER_1 = 0,
-  HEATER_2 = 1,
-  HEATER_3 = 2,
-  SET_OVERHEAT_TEMP = 3,
-  SET_COOLING_TEMP = 4,
-  SET_DISTILLATION_TIME = 6,
-  RESET_WIFI = 7,
-  SET_DISTILLATION_DAY_TEMP_MIN = 8,
-  SET_DISTILLATION_DAY_TEMP_MAX = 9,
-  SET_DISTILLATION_NIGHT_TEMP_MIN = 10,
-  SET_DISTILLATION_NIGHT_TEMP_MAX = 11,
-  UPDATE_TIME_NTP = 12,
-  SET_TOTAL_DAY_DISTILLATION_TIME,
-  SET_TOTAL_NIGHT_DISTILLATION_TIME,
-  CMD_HEATER_1,
-  CMD_HEATER_2,
-  CMD_HEATER_SYS,
-  TURN_ON_DAY_DISTILLATION,
-  TURN_ON_NIGHT_DISTILLATION,
-  TURN_OFF_DISTILLATION,
-  CMD_POWER_PUMP_WATER,
-}
 
 @Injectable()
 export class LiquorKilnCommand extends BaseCommand {
@@ -97,7 +75,9 @@ export class LiquorKilnCommand extends BaseCommand {
 
       const value = this.payload.parameters[action] as boolean | number;
 
-      const bufferAction = LiquorKilnCommand.mapActionToEnum(action);
+      const bufferAction = LiquorKilnCommand.mapActionToEnum(
+        action as keyof typeof ACTION_MAPPING,
+      );
       const numericValue = typeof value === 'boolean' ? (value ? 1 : 0) : value;
       const optimizedPayload = LiquorKilnCommand.packCommand(
         bufferAction,
@@ -154,95 +134,15 @@ export class LiquorKilnCommand extends BaseCommand {
     return crc;
   }
 
-  private static mapActionToEnum(action: string): CommandAction {
-    switch (action) {
-      case 'HEATER_1': {
-        return CommandAction.HEATER_1;
-      }
+  private static mapActionToEnum(
+    action: keyof typeof ACTION_MAPPING,
+  ): LiquorKilnCommandEnum {
+    const mappedAction = ACTION_MAPPING[action];
 
-      case 'HEATER_2': {
-        return CommandAction.HEATER_2;
-      }
-
-      case 'HEATER_3': {
-        return CommandAction.HEATER_3;
-      }
-
-      case 'SET_OVERHEAT_TEMP': {
-        return CommandAction.SET_OVERHEAT_TEMP;
-      }
-
-      case 'SET_COOLING_TEMP': {
-        return CommandAction.SET_COOLING_TEMP;
-      }
-
-      case 'SET_DISTILLATION_TIME': {
-        return CommandAction.SET_DISTILLATION_TIME;
-      }
-
-      case 'RESET_WIFI': {
-        return CommandAction.RESET_WIFI;
-      }
-
-      case 'SET_DISTILLATION_DAY_TEMP_MIN': {
-        return CommandAction.SET_DISTILLATION_DAY_TEMP_MIN;
-      }
-
-      case 'SET_DISTILLATION_DAY_TEMP_MAX': {
-        return CommandAction.SET_DISTILLATION_DAY_TEMP_MAX;
-      }
-
-      case 'SET_DISTILLATION_NIGHT_TEMP_MIN': {
-        return CommandAction.SET_DISTILLATION_NIGHT_TEMP_MIN;
-      }
-
-      case 'SET_DISTILLATION_NIGHT_TEMP_MAX': {
-        return CommandAction.SET_DISTILLATION_NIGHT_TEMP_MAX;
-      }
-
-      case 'UPDATE_TIME_NTP': {
-        return CommandAction.UPDATE_TIME_NTP;
-      }
-
-      case 'SET_TOTAL_DAY_DISTILLATION_TIME': {
-        return CommandAction.SET_TOTAL_DAY_DISTILLATION_TIME;
-      }
-
-      case 'SET_TOTAL_NIGHT_DISTILLATION_TIME': {
-        return CommandAction.SET_TOTAL_NIGHT_DISTILLATION_TIME;
-      }
-
-      case 'CMD_HEATER_1': {
-        return CommandAction.CMD_HEATER_1;
-      }
-
-      case 'CMD_HEATER_2': {
-        return CommandAction.CMD_HEATER_2;
-      }
-
-      case 'CMD_HEATER_SYS': {
-        return CommandAction.CMD_HEATER_SYS;
-      }
-
-      case 'TURN_ON_DAY_DISTILLATION': {
-        return CommandAction.TURN_ON_DAY_DISTILLATION;
-      }
-
-      case 'TURN_ON_NIGHT_DISTILLATION': {
-        return CommandAction.TURN_ON_NIGHT_DISTILLATION;
-      }
-
-      case 'TURN_OFF_DISTILLATION': {
-        return CommandAction.TURN_OFF_DISTILLATION;
-      }
-
-      case 'CMD_POWER_PUMP_WATER': {
-        return CommandAction.CMD_POWER_PUMP_WATER;
-      }
-
-      default: {
-        throw new Error(`Unknown action: ${action}`);
-      }
+    if (!mappedAction) {
+      throw new Error(`Unknown action: ${action}`);
     }
+
+    return mappedAction;
   }
 }

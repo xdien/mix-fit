@@ -14,6 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBody,
   ApiConsumes,
+  ApiExtraModels,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -28,11 +29,12 @@ import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/login-payload.dto';
 import { UserLoginDto } from './dto/user-login.dto';
-import type { UserRegisterDto } from './dto/user-register.dto';
+import { UserRegisterDto } from './dto/user-register.dto';
 // import { UserRegisterDto } from './dto/user-register.dto';
 
 @Controller('auth')
 @ApiTags('auth')
+@ApiExtraModels(UserRegisterDto)
 export class AuthController {
   constructor(
     private userService: UserService,
