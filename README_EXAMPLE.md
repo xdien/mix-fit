@@ -43,3 +43,9 @@ cp mosquitto/config/.mosquitto_passwd_example mosquitto/config/.mosquitto_passwd
 copy mosquitto\\config\\.mosquitto_passwd_example mosquitto\\config\\.mosquitto_passwd
 
 ```
+
+## Run docker-compose
+
+```bash
+docker compose up postgres-db redis-commander mqtt-broker redis
+```
