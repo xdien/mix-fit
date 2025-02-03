@@ -3,6 +3,7 @@ import { Transform, Type } from 'class-transformer';
 import { IsNotEmpty, IsObject, IsString } from 'class-validator';
 
 import type { ICommandPayload } from '../commands/iot-command.interface';
+import { CommandParametersDto } from './command-parameters.dto';
 
 export class CommandPayloadDto implements Omit<ICommandPayload, 'deviceId'> {
   @IsString()
@@ -14,11 +15,9 @@ export class CommandPayloadDto implements Omit<ICommandPayload, 'deviceId'> {
   deviceType!: string;
 
   @ApiProperty({
-    description: 'Các tham số bổ sung',
-    example: { temperature: 25, humidity: 80 },
+    description: 'Parameters control device',
+    type: CommandParametersDto,
     required: false,
-    type: 'object',
-    additionalProperties: true,
   })
   @IsObject()
   @Transform(({ value }) => {
@@ -28,7 +27,7 @@ export class CommandPayloadDto implements Omit<ICommandPayload, 'deviceId'> {
 
     return value;
   })
-  @Type(() => Object)
+  @Type(() => CommandParametersDto)
   parameters?: Record<string, unknown>;
 
   @ApiProperty({
