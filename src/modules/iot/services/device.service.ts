@@ -2,9 +2,9 @@ import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import type { AddDeviceDto } from '../dto/add-device.dto';
-import type { DeviceDto } from '../dto/device.dto';
-import { DeviceEntity } from '../entities/device.entity';
+import type { AddDeviceDto } from '../dtos/add-device.dto';
+import type { DeviceDto } from '../dtos/device.dto';
+import { DeviceEntity } from '../entity/device.entity';
 
 @Injectable()
 export class DeviceService {

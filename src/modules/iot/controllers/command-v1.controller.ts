@@ -14,8 +14,8 @@ import {
 } from '@nestjs/swagger';
 
 import { AuthWithDeviceOwner } from '../../../guards/auth-with-device-owner.guard';
-import { CommandPayloadDto } from '../dto/command-payload.dto';
-import { CommandStatusDto } from '../dto/command-status.dto';
+import { CommandPayloadDto } from '../dtos/command-payload.dto';
+import { CommandStatusDto } from '../dtos/command-status.dto';
 import { IoTCommandV1Service } from '../services/command-v1.service';
 
 @Controller('/v1/iot/commands')

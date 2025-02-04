@@ -16,16 +16,19 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { RoleType } from '../../constants';
-import { Auth } from '../../decorators';
+import { RoleType } from '../../../constants';
+import { Auth } from '../../../decorators';
+import {
+  MetricDto,
+  TelemetryPayloadDto,
+} from '../../device-telemetry/dtos/telemetry.dto';
+import { OilTemperatureEvent } from '../../device-telemetry/dtos/temperature-event.dto';
 import {
   DeviceStatusEventDto,
   IoTEvents,
   SensorDataEventDto,
-} from '../../modules/iot/iot.events';
-import { DeviceTelemetryService } from './device-telemetry.service';
-import { MetricDto, TelemetryPayloadDto } from './dtos/telemetry.dto';
-import { OilTemperatureEvent } from './dtos/temperature-event.dto';
+} from '../iot.events';
+import { DeviceTelemetryService } from '../services/device-telemetry.service';
 
 // @Injectable()
 // export class ParseTelemetryPipe

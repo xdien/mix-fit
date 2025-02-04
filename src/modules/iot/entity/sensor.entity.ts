@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 import { StringFieldOptional } from '../../../decorators';
-import { DeviceTelemetryEntity } from '../../device-telemetry/enties/device-telemetry.entity';
+import { DeviceTelemetryEntity } from './device-telemetry.entity';
 import { MeasurementUnitEntity } from './measurement-units.entity';
 
 @Entity({ name: 'sensors' })

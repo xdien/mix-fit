@@ -7,7 +7,7 @@ import { DeviceCommandType } from '../../../constants/device-command-type';
 import { MqttService } from '../../../mqtt/mqtt.service';
 import { ACTION_MAPPING } from '../device-adapter/liquor-kiln-commnad.type';
 import type { LiquorKilnCommandEnum } from '../device-adapter/liquor-kiln-firmware.type';
-import type { CommandLogEntity } from '../entities/device-command.entity';
+import type { CommandLogEntity } from '../../iot/entity/device-command.entity';
 import { BaseCommand } from './base.command';
 import { CommandStatus } from './iot-command.enums';
 import { ICommandPayload } from './iot-command.interface';

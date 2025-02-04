@@ -4,15 +4,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bullmq';
 import { Repository } from 'typeorm';
 
-import { QueueName } from '../../../constants/queue-key';
 // import type { BaseCommand } from '../commands/base.command';
 import type { ICommandResponse } from '../commands/iot-command.interface';
-import type { CommandPayloadDto } from '../dto/command-payload.dto';
-import { DeviceEntity } from '../entities/device.entity';
+import type { CommandPayloadDto } from '../dtos/command-payload.dto';
+import type { CommandResponseDto } from '../dtos/command-response.dto';
+import { DeviceEntity } from '../entity/device.entity';
 
 @Injectable()
-export class IoTCommandV1Service {
-  private readonly logger = new Logger(IoTCommandV1Service.name);
+export class IoTCommandService {
+  private readonly logger = new Logger(IoTCommandService.name);
 
   constructor(
     @InjectRepository(DeviceEntity)
@@ -23,7 +23,7 @@ export class IoTCommandV1Service {
   async executeCommand(
     deviceId: string,
     payload: CommandPayloadDto,
-  ): Promise<ICommandResponse> {
+  ): Promise<CommandResponseDto> {
     this.logger.debug('Finding device', deviceId);
     const device = await this.deviceRepository.findOne({
       where: { deviceId },
@@ -33,8 +33,9 @@ export class IoTCommandV1Service {
       throw new NotFoundException(`Device ${deviceId} not found`);
     }
 
-    const job = await this.commandQueue.add(QueueName.REDIS_QUEUE_IOT_V1, {
+    const job = await this.commandQueue.add('iot-commands', {
       ...payload,
+      deviceId,
     });
 
     if (!job.id) {

@@ -3,7 +3,7 @@ import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { AbstractWithIdEntity } from '../../common/abstract-with-id.entity';
 import { RoleType } from '../../constants';
 import { UseDto } from '../../decorators';
-import { DeviceEntity } from '../iot-control/entities/device.entity';
+import { DeviceEntity } from '../iot/entity/device.entity';
 import { PostEntity } from '../post/post.entity';
 import type { UserDtoOptions } from './dtos/user.dto';
 import { UserDto } from './dtos/user.dto';

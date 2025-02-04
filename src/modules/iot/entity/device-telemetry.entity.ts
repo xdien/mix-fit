@@ -13,7 +13,7 @@ import {
   StringField,
   StringFieldOptional,
 } from '../../../decorators';
-import { SensorEntity } from '../../iot-control/entities/sensor.entity';
+import { SensorEntity } from './sensor.entity';
 
 export enum MetricValueType {
   NUMERIC = 'numeric',

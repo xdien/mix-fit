@@ -1,13 +1,13 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-import { CommandStatus } from '../commands/iot-command.enums'; // Ensure CommandStatus is exported as a value
-import { ICommandPayload } from '../commands/iot-command.interface';
 import {
   DateField,
   DateFieldOptional,
   StringField,
   StringFieldOptional,
-} from './../../../decorators';
+} from '../../../decorators';
+import { CommandStatus } from '../../iot/commands/iot-command.enums'; // Ensure CommandStatus is exported as a value
+import { ICommandPayload } from '../../iot/commands/iot-command.interface';
 
 @Entity('command_logs')
 export class CommandLogEntity {

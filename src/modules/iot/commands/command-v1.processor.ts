@@ -10,8 +10,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Job, Queue } from 'bullmq';
 import { Repository } from 'typeorm';
 
-import { QueueName } from '../../../constants/queue-key';
-import { DeviceEntity } from '../entities/device.entity';
+import { QueueNameEnum } from '../../../constants/queue-key';
+import { DeviceEntity } from '../../iot/entity/device.entity';
 import { CommandFactory } from './command.factory';
 import type {
   ICommandPayload,
@@ -24,7 +24,7 @@ export class CommandProcessor extends WorkerHost {
   private readonly logger = new Logger(CommandProcessor.name);
 
   constructor(
-    @InjectQueue(QueueName.REDIS_QUEUE_IOT_V1)
+    @InjectQueue(QueueNameEnum.REDIS_QUEUE_IOT_V1)
     private readonly commandV1Queue: Queue<ICommandPayload>,
     @InjectRepository(DeviceEntity)
     private readonly deviceRepository: Repository<DeviceEntity>,

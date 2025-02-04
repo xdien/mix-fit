@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 
 import { DeviceCommandType } from '../../../constants/device-command-type';
 import { MqttService } from '../../../mqtt/mqtt.service';
-import { CommandLogEntity } from '../entities/device-command.entity';
+import { CommandLogEntity } from '../../iot/entity/device-command.entity';
 import type { BaseCommand } from './base.command';
 import { BaseCommandFactory } from './base-command.factory';
 import type { ICommandPayload } from './iot-command.interface';

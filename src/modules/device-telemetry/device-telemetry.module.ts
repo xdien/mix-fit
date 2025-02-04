@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WebsocketModule } from '../../websocket/websocket.module';
-import { DeviceTelemetryController } from './device-telemetry.controller';
-import { DeviceTelemetryService } from './device-telemetry.service';
-import { DeviceTelemetryEntity } from './enties/device-telemetry.entity';
+import { DeviceTelemetryController } from '../iot/controllers/device-telemetry.controller';
+import { DeviceTelemetryEntity } from '../iot/entity/device-telemetry.entity';
+import { DeviceTelemetryService } from '../iot/services/device-telemetry.service';
 
 @Module({
   imports: [

@@ -7,7 +7,7 @@ import {
   UseDto,
 } from '../../../decorators';
 import { UserEntity } from '../../user/user.entity';
-import { DeviceDto } from '../dto/device.dto';
+import { DeviceDto } from '../dtos/device.dto';
 import { DeviceTypeEntity } from './device-types.entity';
 
 @Entity({ name: 'device' })

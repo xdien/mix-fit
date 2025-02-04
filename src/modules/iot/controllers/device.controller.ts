@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { DeviceDto } from 'modules/iot-control/dto/device.dto';
+import type { DeviceDto } from 'modules/iot/dtos/device.dto';
 
 import { RoleType } from '../../../constants';
 import { Auth, AuthUser } from '../../../decorators';

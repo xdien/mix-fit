@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Job, Queue } from 'bullmq';
 import { Repository } from 'typeorm';
 
-import { DeviceEntity } from '../entities/device.entity';
+import { DeviceEntity } from '../../iot/entity/device.entity';
 import { CommandFactory } from './command.factory';
 import type {
   ICommandPayload,

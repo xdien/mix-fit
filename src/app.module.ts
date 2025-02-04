@@ -17,7 +17,6 @@ import { CmsAuthModule } from './modules/cms-auth/cms-auth.module';
 import { DeviceTelemetryModule } from './modules/device-telemetry/device-telemetry.module';
 import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
 import { IotModule } from './modules/iot/iot.module';
-import { IotControlModule } from './modules/iot-control/iot-control.module';
 import { PostModule } from './modules/post/post.module';
 import { TaiKhoanModule } from './modules/tai-khoan/tai-khoan.module';
 import { UserModule } from './modules/user/user.module';
@@ -120,7 +119,6 @@ import { WebsocketModule } from './websocket/websocket.module';
     IotModule,
     TaiKhoanModule,
     CmsAuthModule,
-    IotControlModule,
     DeviceTelemetryModule,
   ],
   providers: [],

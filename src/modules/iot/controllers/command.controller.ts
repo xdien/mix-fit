@@ -17,10 +17,10 @@ import {
 } from '@nestjs/swagger';
 
 import { AuthWithDeviceOwner } from '../../../guards/auth-with-device-owner.guard';
-import { DeviceTypeDto } from '../../../modules/iot/dtos/device-type.dto';
-import { CommandPayloadDto } from '../dto/command-payload.dto';
-import { CommandStatusDto } from '../dto/command-status.dto';
-import { LiquorKilnCommandActionDto } from '../dto/liquor-kiln-command.dto';
+import { DeviceTypeDto } from '../dtos/device-type.dto';
+import { CommandPayloadDto } from '../dtos/command-payload.dto';
+import { CommandStatusDto } from '../dtos/command-status.dto';
+import { LiquorKilnCommandActionDto } from '../dtos/liquor-kiln-command.dto';
 import { IoTCommandService } from '../services/command.service';
 
 @Controller('iot/commands')

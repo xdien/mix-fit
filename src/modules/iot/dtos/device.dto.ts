@@ -2,7 +2,7 @@ import { ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { AbstractDto } from '../../../common/dto/abstract.dto';
 import { BooleanFieldOptional, StringFieldOptional } from '../../../decorators';
-import { DeviceTypeEntity } from '../entities/device-types.entity';
+import { DeviceTypeEntity } from '../entity/device-types.entity';
 
 export class DeviceDto extends AbstractDto {
   @PrimaryGeneratedColumn('uuid')
