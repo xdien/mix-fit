@@ -1,9 +1,11 @@
 import { SetMetadata } from '@nestjs/common';
 
+import type { DeviceCommandType } from '../../../constants/device-command-type';
+
 export const DEVICE_HANDLER_METADATA = 'device_handler';
 
 export interface IDeviceHandlerMetadata {
-  deviceId: string;
+  deviceType: DeviceCommandType;
   description?: string;
 }
 
