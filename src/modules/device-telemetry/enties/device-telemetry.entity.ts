@@ -32,6 +32,9 @@ export class DeviceTelemetryEntity {
   @ManyToOne(() => SensorEntity, (sensor) => sensor.telemetry)
   sensor!: SensorEntity;
 
+  @StringFieldOptional({ nullable: true })
+  metricName?: string;
+
   @DateField()
   time!: Date;
 
