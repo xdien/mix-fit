@@ -81,7 +81,7 @@ export class DeviceTelemetryService {
       .createQueryBuilder('t')
       .where('t.device_id = :deviceId', { deviceId })
       .andWhere('t.metric_name = :metricName', { metricName })
-      .andWhere('t.time BETWEEN :startTime AND :endTime', {
+      .andWhere('t.created_at BETWEEN :startTime AND :endTime', {
         startTime,
         endTime,
       });
@@ -90,7 +90,7 @@ export class DeviceTelemetryService {
       // Sử dụng time_bucket của TimescaleDB nếu có
       return query
         .select([
-          `time_bucket('${aggregateMinutes} minutes', t.time) as time`,
+          `time_bucket('${aggregateMinutes} minutes', t.created_at) as time`,
           't.metric_name',
           'AVG(t.numeric_value) as avg_value',
           'MAX(t.numeric_value) as max_value',
@@ -102,7 +102,7 @@ export class DeviceTelemetryService {
         .getRawMany();
     }
 
-    return query.orderBy('t.time', 'ASC').getMany();
+    return query.orderBy('t.created_at', 'ASC').getMany();
   }
 
   async deleteOldData(retentionDays: number): Promise<void> {
