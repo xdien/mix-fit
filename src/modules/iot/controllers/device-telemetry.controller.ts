@@ -18,16 +18,14 @@ import {
 
 import { RoleType } from '../../../constants';
 import { Auth } from '../../../decorators';
-import {
-  MetricDto,
-  TelemetryPayloadDto,
-} from '../../device-telemetry/dtos/telemetry.dto';
 import { OilTemperatureEvent } from '../../device-telemetry/dtos/temperature-event.dto';
+import { MetricDto, TelemetryPayloadDto } from '../dtos/telemetry.dto';
 import {
   DeviceStatusEventDto,
   IoTEvents,
   SensorDataEventDto,
 } from '../iot.events';
+import { DeviceRegistryService } from '../services/device-registry.service';
 import { DeviceTelemetryService } from '../services/device-telemetry.service';
 
 // @Injectable()
@@ -57,7 +55,10 @@ import { DeviceTelemetryService } from '../services/device-telemetry.service';
 export class DeviceTelemetryController {
   private readonly logger = new Logger(DeviceTelemetryController.name);
 
-  constructor(private readonly telemetryService: DeviceTelemetryService) {}
+  constructor(
+    private readonly deviceRegistryService: DeviceRegistryService,
+    private readonly telemetryService: DeviceTelemetryService,
+  ) {}
 
   @Post()
   @Auth([RoleType.USER])
@@ -121,8 +122,6 @@ export class DeviceTelemetryController {
     @Payload() message: TelemetryPayloadDto,
     @Ctx() context: MqttContext,
   ) {
-    // this.logger.debug(`Received telemetry data: ${JSON.stringify(message)}`);
-
     try {
       const deviceId = context.getTopic().split('/')[1];
 
@@ -130,27 +129,21 @@ export class DeviceTelemetryController {
         throw new Error('Device ID not found in topic');
       }
 
-      let temperatureCloudevent: SensorDataEventDto;
+      const handler = this.deviceRegistryService.getHandler(deviceId);
+      const transformedData: TelemetryPayloadDto = handler
+        ? ((await handler.transformTelemetry(message)) as TelemetryPayloadDto)
+        : message;
 
-      if (deviceId === 'esp8266_001') {
-        // only process telemetry data from specific device
-        const dataEvent = this.transformTelemetryPayload(message);
-        await this.telemetryService.saveTelemetryBatch(dataEvent);
-        temperatureCloudevent = {
-          telemetryData: dataEvent,
-          eventType: IoTEvents.SENSOR_DATA_MONITORING,
-        };
-      } else {
-        await this.telemetryService.saveTelemetryBatch(message);
-        temperatureCloudevent = {
-          telemetryData: {
-            deviceId,
-            timestamp: new Date(),
-            metrics: message.metrics,
-          },
-          eventType: IoTEvents.SENSOR_DATA_MONITORING,
-        };
-      }
+      await this.telemetryService.saveTelemetryBatch(transformedData);
+
+      const temperatureCloudevent: SensorDataEventDto = {
+        telemetryData: {
+          deviceId,
+          timestamp: new Date(),
+          metrics: transformedData.metrics,
+        },
+        eventType: IoTEvents.SENSOR_DATA_MONITORING,
+      };
 
       this.telemetryService.broadcastToMonitor(temperatureCloudevent);
     } catch (error) {
@@ -165,63 +158,5 @@ export class DeviceTelemetryController {
     }
   }
 
-  transformTelemetryPayload(payload: any): TelemetryPayloadDto {
-    const metrics: MetricDto[] = [
-      {
-        sensorId: payload.idNau,
-        name: 'current',
-        value: payload.a,
-        unit: 'ampere',
-        metadata: { type: 'electrical' },
-      },
-      {
-        sensorId: payload.idNau,
-        name: 'power',
-        value: payload.w,
-        unit: 'watt',
-        metadata: { type: 'electrical' },
-      },
-      {
-        sensorId: payload.idNau,
-        name: 'voltage',
-        value: payload.v,
-        unit: 'volt',
-        metadata: { type: 'electrical' },
-      },
-      {
-        sensorId: payload.idNau,
-        name: 'frequency',
-        value: payload.f,
-        unit: 'hertz',
-        metadata: { type: 'electrical' },
-      },
-      {
-        sensorId: payload.idNau,
-        name: 'kilowatt_hour',
-        value: payload.kw,
-        unit: 'kWh',
-        metadata: { type: 'energy' },
-      },
-      {
-        sensorId: payload.idNau,
-        name: 'oil_temperature',
-        value: payload.tDau,
-        unit: 'celsius',
-        metadata: { type: 'temperature' },
-      },
-      {
-        sensorId: payload.idNau,
-        name: 'water_temperature',
-        value: payload.tNuoc,
-        unit: 'celsius',
-        metadata: { type: 'temperature' },
-      },
-    ];
-
-    return {
-      deviceId: payload.device_id,
-      timestamp: new Date(Number.parseInt(payload.tm) * 1000), // Assuming timestamp is in seconds
-      metrics,
-    };
-  }
+  transformTelemetryPayload(payload: any): TelemetryPayloadDto {}
 }

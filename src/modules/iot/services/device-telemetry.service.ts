@@ -4,7 +4,7 @@ import type { SensorDataEventDto } from 'modules/iot/iot.events';
 import { LessThan, Repository } from 'typeorm';
 
 import { SocketService } from '../../../websocket/websocket.service';
-import type { TelemetryPayloadDto } from '../../device-telemetry/dtos/telemetry.dto';
+import type { TelemetryPayloadDto } from '../dtos/telemetry.dto';
 import { DeviceTelemetryEntity } from '../entity/device-telemetry.entity';
 
 @Injectable()
