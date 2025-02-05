@@ -67,6 +67,7 @@ export class LiquorKilnHandler extends BaseDeviceHandler {
 
     return Promise.resolve({
       deviceId: payload.device_id,
+      deviceType: DeviceCommandType.LIQUOR_KILN,
       timestamp: new Date(Number.parseInt(payload.tm) * 1000), // Assuming timestamp is in seconds
       metrics,
     });

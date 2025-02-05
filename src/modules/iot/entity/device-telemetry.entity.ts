@@ -35,6 +35,10 @@ export class DeviceTelemetryEntity {
   @StringFieldOptional({ nullable: true })
   metricName?: string;
 
+  // for querying by device type relation timescale db
+  @StringFieldOptional({ nullable: true })
+  deviceType?: string;
+
   @DateField()
   time!: Date;
 

@@ -26,6 +26,7 @@ export class DeviceTelemetryService {
       telemetry.metadata = metric.metadata ?? {};
       telemetry.setValue(metric.value);
       telemetry.metricName = metric.name;
+      telemetry.deviceType = payload.deviceType;
 
       return telemetry;
     });
