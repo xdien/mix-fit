@@ -204,6 +204,7 @@ const rules = {
         'Controller',
         'Gateway',
         'Module',
+        'Handler',
       ],
     },
     {

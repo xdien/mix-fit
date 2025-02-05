@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { TelemetryPayloadDto } from '../../modules/device-telemetry/dtos/telemetry.dto';
+import { TelemetryPayloadDto } from './dtos/telemetry.dto';
 
 export enum IoTEvents {
   // Sensor events

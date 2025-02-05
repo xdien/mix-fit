@@ -20,7 +20,7 @@ export const dataSource = new DataSource({
   entities: [
     'src/modules/{auth,user,post}/*.entity{.ts,.js}',
     'src/modules/device-telemetry/**/*.entity{.ts,.js}',
-    'src/modules/iot-control/**/*.entity{.ts,.js}',
+    'src/modules/iot/**/*.entity{.ts,.js}',
   ],
   migrations: ['src/database/migrations/*{.ts,.js}'],
 });
