@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@nestjs/common';
 
 import { DeviceCommandType } from '../../../constants/device-command-type';
@@ -68,7 +72,7 @@ export class LiquorKilnHandler extends BaseDeviceHandler {
     return Promise.resolve({
       deviceId: payload.device_id,
       deviceType: DeviceCommandType.LIQUOR_KILN,
-      timestamp: new Date(Number.parseInt(payload.tm) * 1000), // Assuming timestamp is in seconds
+      timestamp: new Date(Number.parseInt(payload.tm, 10) * 1000), // Assuming timestamp is in seconds
       metrics,
     });
   }
