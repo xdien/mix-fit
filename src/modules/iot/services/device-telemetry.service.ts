@@ -19,13 +19,13 @@ export class DeviceTelemetryService {
 
   async saveTelemetryBatch(payload: TelemetryPayloadDto): Promise<void> {
     const timestamp = payload.timestamp ?? new Date();
-    this.logger.log(typeof payload);
     const entities = payload.metrics.map((metric) => {
       const telemetry = new DeviceTelemetryEntity();
       telemetry.deviceId = payload.deviceId;
       telemetry.time = timestamp;
       telemetry.metadata = metric.metadata ?? {};
       telemetry.setValue(metric.value);
+      telemetry.metricName = metric.name;
 
       return telemetry;
     });
@@ -118,9 +118,6 @@ export class DeviceTelemetryService {
 
   // push data to monitoring dashboard
   broadcastToMonitor(event: SensorDataEventDto): void {
-    this.logger.log(
-      `Broadcasting sensor data to monitoring dashboard ${JSON.stringify(event)}`,
-    );
     this.websocketService.broadcastToMonitor(event);
   }
 }

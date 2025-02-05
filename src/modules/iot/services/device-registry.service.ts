@@ -50,8 +50,8 @@ export class DeviceRegistryService implements OnModuleInit {
     }
   }
 
-  getHandler(deviceId: string): IDeviceHandler | undefined {
-    return this.deviceHandlers.get(deviceId);
+  getHandler(deviceType: string): IDeviceHandler | undefined {
+    return this.deviceHandlers.get(deviceType);
   }
 
   // Helper method to check registered handlers

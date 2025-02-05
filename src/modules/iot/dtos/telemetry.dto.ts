@@ -49,6 +49,13 @@ export class TelemetryPayloadDto implements ITelemetryPayload {
   deviceId!: string;
 
   @ApiProperty({
+    description: 'Type of the device to which the telemetry data belongs',
+    example: 'sensor-001',
+    required: false,
+  })
+  deviceType?: string;
+
+  @ApiProperty({
     description: 'Timestamp when the telemetry data was collected',
     example: '2024-03-10T15:30:00Z',
   })

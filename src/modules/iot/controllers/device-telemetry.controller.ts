@@ -18,7 +18,6 @@ import {
 
 import { RoleType } from '../../../constants';
 import { Auth } from '../../../decorators';
-import { OilTemperatureEvent } from '../../device-telemetry/dtos/temperature-event.dto';
 import { MetricDto, TelemetryPayloadDto } from '../dtos/telemetry.dto';
 import {
   DeviceStatusEventDto,
@@ -28,30 +27,9 @@ import {
 import { DeviceRegistryService } from '../services/device-registry.service';
 import { DeviceTelemetryService } from '../services/device-telemetry.service';
 
-// @Injectable()
-// export class ParseTelemetryPipe
-//   implements PipeTransform<unknown, TelemetryPayloadDto>
-// {
-//   transform(value: unknown): TelemetryPayloadDto {
-//     if (typeof value !== 'string') {
-//       throw new BadRequestException('Invalid payload format');
-//     }
-
-//     const parsed = JSON.parse(value);
-
-//     // Add validation logic here if needed
-//     return parsed as TelemetryPayloadDto;
-//   }
-// }
-
 @Controller('telemetry')
 @ApiTags('Telemetry')
-@ApiExtraModels(
-  OilTemperatureEvent,
-  SensorDataEventDto,
-  MetricDto,
-  DeviceStatusEventDto,
-)
+@ApiExtraModels(SensorDataEventDto, MetricDto, DeviceStatusEventDto)
 export class DeviceTelemetryController {
   private readonly logger = new Logger(DeviceTelemetryController.name);
 
@@ -116,20 +94,27 @@ export class DeviceTelemetryController {
     );
   }
 
-  @EventPattern('devices/+/telemetry')
+  @EventPattern('devices/+/telemetry/+')
   //   @Auth([RoleType.USER])
   async handleTelemetryEvent(
     @Payload() message: TelemetryPayloadDto,
     @Ctx() context: MqttContext,
   ) {
     try {
-      const deviceId = context.getTopic().split('/')[1];
+      const deviceType = context.getTopic().split('/')[1];
+      const deviceId = context.getTopic().split('/')[3];
 
-      if (!deviceId) {
+      if (!deviceType) {
         throw new Error('Device ID not found in topic');
       }
 
-      const handler = this.deviceRegistryService.getHandler(deviceId);
+      if (!deviceId) {
+        throw new Error('Device type not found in topic');
+      }
+
+      this.logger.debug('Message received: ' + JSON.stringify(message));
+
+      const handler = this.deviceRegistryService.getHandler(deviceType);
       const transformedData: TelemetryPayloadDto = handler
         ? ((await handler.transformTelemetry(message)) as TelemetryPayloadDto)
         : message;
@@ -139,6 +124,7 @@ export class DeviceTelemetryController {
       const temperatureCloudevent: SensorDataEventDto = {
         telemetryData: {
           deviceId,
+          deviceType,
           timestamp: new Date(),
           metrics: transformedData.metrics,
         },
@@ -157,6 +143,4 @@ export class DeviceTelemetryController {
       throw error;
     }
   }
-
-  transformTelemetryPayload(payload: any): TelemetryPayloadDto {}
 }
