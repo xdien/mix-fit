@@ -1,4 +1,4 @@
-import type { TelemetryPayloadDto } from '../dto/telemetry-payload.dto';
+import type { TelemetryPayloadDto } from '../dtos/telemetry.dto';
 
 export interface IDeviceHandler {
   transformTelemetry(
