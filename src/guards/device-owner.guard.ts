@@ -9,7 +9,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 
 import { RoleType } from '../constants';
-import { DeviceService } from '../modules/iot-control/services/device.service';
+import { DeviceService } from '../modules/iot/services/device.service';
 
 @Injectable()
 export class DeviceOwnerGuard implements CanActivate {

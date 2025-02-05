@@ -85,7 +85,7 @@ export class ApiConfigService {
       __dirname + '/../../modules/post/*.entity{.ts,.js}',
       __dirname + '/../../modules/post/*.view-entity{.ts,.js}',
       __dirname + '/../../modules/device-telemetry/**/*.entity{.ts,.js}',
-      __dirname + '/../../modules/iot-control/**/*.entity{.ts,.js}',
+      __dirname + '/../../modules/iot/**/*.entity{.ts,.js}',
     ];
     const migrations = [
       __dirname + '/../../database/migrations/main/*{.ts,.js}',
@@ -139,14 +139,14 @@ export class ApiConfigService {
 
   get iotPosgresConfig(): TypeOrmModuleOptions {
     const entities = [__dirname + '/../../modules/__/*.entity{.ts,.js}'];
-    const migrations = [
-      __dirname + '/../../database/migrations/iot/*{.ts,.js}',
-    ];
+    // const migrations = [
+    //   __dirname + '/../../database/migrations/iot/*{.ts,.js}',
+    // ];
     Logger.log(entities);
 
     return {
       entities,
-      migrations,
+      //   migrations,
       keepConnectionAlive: !this.isTest,
       dropSchema: this.isTest,
       type: this.getString('IOT_DB_TYPE') as any,
