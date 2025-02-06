@@ -11,12 +11,14 @@ export class CommandStatusDto {
     description: 'Trạng thái của lệnh',
     enum: ['PENDING', 'EXECUTING', 'COMPLETED', 'FAILED'],
     example: 'COMPLETED',
+    required: false,
   })
-  status: string | undefined;
+  status?: string;
 
   @ApiProperty({
     description: 'Thời gian thực thi',
     example: '2024-03-15T10:30:00Z',
+    required: false,
   })
-  executedAt: Date | undefined;
+  executedAt?: Date | undefined;
 }
