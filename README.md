@@ -1,6 +1,6 @@
 # My hobby project
 
-![Build Status](https://github.com/xdien/mix-fit/actions/workflows/pr-check.yml/badge.svg)
+![Build Status](https://github.com/xdien/mix-fit/actions/workflows/pr-check.yaml/badge.svg)
 ![Deploy Status](https://github.com/xdien/mix-fit/actions/workflows/deploy.yml/badge.svg)
 
 - A personal hobby project aimed at creating a unified integration platform, initially focused on IoT devices with potential for future expansions.
