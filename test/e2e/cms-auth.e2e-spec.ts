@@ -10,9 +10,7 @@ describe('CmsAuthController (e2e)', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        CmsAuthModule,
-      ],
+      imports: [CmsAuthModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
