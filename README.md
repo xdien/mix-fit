@@ -21,22 +21,35 @@ Mix-Fit is an integration platform built following Clean Architecture principles
 
 ```
 src/
-├── application/        # Use cases & application logic
-│   ├── dtos/          # Data Transfer Objects
-│   ├── ports/         # Ports (interfaces) for adapters
-│   └── services/      # Application services
-├── domain/            # Business logic & entities
-│   ├── entities/      # Domain entities
-│   ├── repositories/  # Repository interfaces
-│   └── value-objects/ # Value objects
-├── infrastructure/    # External concerns & implementations
-│   ├── config/        # Configuration
-│   ├── database/      # Database setup & migrations
-│   └── repositories/  # Repository implementations
-└── interfaces/        # API & external interfaces
-    ├── controllers/   # REST controllers
-    ├── middlewares/   # HTTP middlewares
-    └── routes/        # Route definitions
+├── common/           # Shared DTOs and utilities
+├── config/          # Application configuration
+├── constants/       # Global constants
+├── database/        # Database configuration
+│   ├── migrations/  # Database migrations
+│   └── sql/         # SQL scripts
+├── decorators/      # Custom decorators
+├── exceptions/      # Custom exceptions
+├── filters/         # Exception filters
+├── grpc/           # gRPC service definitions
+├── guards/         # Authentication guards
+├── i18n/           # Internationalization
+├── interceptors/   # Request/Response interceptors
+├── modules/        # Feature modules
+│   ├── auth/       # Authentication module
+│   ├── cms/        # Content management
+│   ├── iot/        # IoT device management
+│   │   ├── commands/      # Command handlers
+│   │   ├── device-adapter/# Device protocols
+│   │   ├── entity/       # IoT entities
+│   │   └── services/     # IoT services
+│   ├── post/       # Post management
+│   └── user/       # User management
+├── mqtt/           # MQTT client/broker
+├── providers/      # Service providers
+├── shared/         # Shared services
+├── translation/    # Translation services
+├── validators/     # Custom validators
+└── websocket/      # WebSocket handlers
 ```
 
 ## Getting Started
