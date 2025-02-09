@@ -13,11 +13,9 @@ import { DataSource } from 'typeorm';
 import { addTransactionalDataSource } from 'typeorm-transactional';
 
 import { AuthModule } from './modules/auth/auth.module';
-import { CmsAuthModule } from './modules/cms-auth/cms-auth.module';
 import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
 import { IotModule } from './modules/iot/iot.module';
 import { PostModule } from './modules/post/post.module';
-import { TaiKhoanModule } from './modules/tai-khoan/tai-khoan.module';
 import { UserModule } from './modules/user/user.module';
 import { MqttModule } from './mqtt/mqtt.module';
 import { ApiConfigService } from './shared/services/api-config.service';
@@ -116,8 +114,6 @@ import { WebsocketModule } from './websocket/websocket.module';
     HealthCheckerModule,
     MqttModule,
     IotModule,
-    TaiKhoanModule,
-    CmsAuthModule,
   ],
   providers: [],
   controllers: [],
