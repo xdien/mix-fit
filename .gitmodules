@@ -1,0 +1,3 @@
+[submodule "src/modules/cms"]
+	path = src/modules/cms
+	url = git@github.com:xdien/cms-module.git
