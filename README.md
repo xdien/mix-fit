@@ -98,6 +98,7 @@ yarn build:prod
 - **Hot Reload**: Rapid development with nodemon
 - **IoT Support**: Integrated MQTT Broker (Mosquitto)
 - **Device Control**: 11-byte protocol for efficient device control
+- **Dynamic Module Loading**: Runtime module loading
 
 ## Documentation
 
