@@ -97,6 +97,7 @@ yarn build:prod
 - **Code Quality**: ESLint + Prettier
 - **Hot Reload**: Rapid development with nodemon
 - **IoT Support**: Integrated MQTT Broker (Mosquitto)
+- **Device Control**: 11-byte protocol for efficient device control
 
 ## Documentation
 
@@ -142,8 +143,6 @@ yarn lint
 # Fix linting issues
 yarn lint:fix
 
-# Format code
-yarn format
 ```
 
 ## Contributing

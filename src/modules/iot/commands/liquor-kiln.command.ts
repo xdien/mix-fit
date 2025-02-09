@@ -5,9 +5,9 @@ import { Repository } from 'typeorm';
 
 import { DeviceCommandType } from '../../../constants/device-command-type';
 import { MqttService } from '../../../mqtt/mqtt.service';
+import type { CommandLogEntity } from '../../iot/entity/device-command.entity';
 import { ACTION_MAPPING } from '../device-adapter/liquor-kiln-commnad.type';
 import type { LiquorKilnCommandEnum } from '../device-adapter/liquor-kiln-firmware.type';
-import type { CommandLogEntity } from '../../iot/entity/device-command.entity';
 import { BaseCommand } from './base.command';
 import { CommandStatus } from './iot-command.enums';
 import { ICommandPayload } from './iot-command.interface';
@@ -115,9 +115,9 @@ export class LiquorKilnCommand extends BaseCommand {
   static packCommand(action: number, value: number): Buffer {
     const buffer = Buffer.alloc(this.BUFFER_SIZE);
     buffer[0] = action & 0xff;
-    buffer.writeDoubleLE(value, 1); // Đổi sang LE (little-endian)
+    buffer.writeDoubleLE(value, 1);
     const checksum = this.calculateChecksum(buffer.subarray(0, 9));
-    buffer.writeUInt16LE(checksum, 9); // Checksum cũng phải LE
+    buffer.writeUInt16LE(checksum, 9);
 
     return buffer;
   }
