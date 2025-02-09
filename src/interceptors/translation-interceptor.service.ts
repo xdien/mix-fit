@@ -8,7 +8,7 @@ import type { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 
 import type { AbstractWithIdDto } from '../common/dto/abstract-with-id.dto';
-import { TranslationService } from '../shared/services/translation.service';
+import { TranslationService } from '../translation/translation.service';
 
 // FIXME: add implementation
 @Injectable()
