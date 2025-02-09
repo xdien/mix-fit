@@ -12,7 +12,7 @@ import type { PageDto } from '../../common/dto/page.dto';
 import { RoleType } from '../../constants';
 import { ApiPageResponse, Auth, AuthUser, UUIDParam } from '../../decorators';
 import { UseLanguageInterceptor } from '../../interceptors/language-interceptor.service';
-import { TranslationService } from '../../shared/services/translation.service';
+import { TranslationService } from '../../translation/translation.service';
 import { UserDto } from './dtos/user.dto';
 import { UsersPageOptionsDto } from './dtos/users-page-options.dto';
 import { UserEntity } from './user.entity';

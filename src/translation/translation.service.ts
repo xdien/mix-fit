@@ -3,10 +3,10 @@ import { isArray, isString, map } from 'lodash';
 import type { TranslateOptions } from 'nestjs-i18n';
 import { I18nService } from 'nestjs-i18n';
 
-import { AbstractWithIdDto } from '../../common/dto/abstract-with-id.dto';
-import { STATIC_TRANSLATION_DECORATOR_KEY } from '../../decorators';
-import type { ITranslationDecoratorInterface } from '../../interfaces';
-import { ContextProvider } from '../../providers';
+import { AbstractWithIdDto } from '../common/dto/abstract-with-id.dto';
+import { STATIC_TRANSLATION_DECORATOR_KEY } from '../decorators';
+import type { ITranslationDecoratorInterface } from '../interfaces';
+import { ContextProvider } from '../providers';
 
 @Injectable()
 export class TranslationService {
@@ -52,6 +52,7 @@ export class TranslationService {
             }),
           );
         }
+
         return null;
       }),
     );
