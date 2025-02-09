@@ -11,7 +11,6 @@ Mix-Fit is an integration platform built following Clean Architecture principles
 
 - Clean Architecture with distinct layers
 - Dependency Injection for loose coupling
-- Domain-Driven Design (DDD) for business logic modeling
 - Repository pattern for data access
 - JWT Authentication for security
 - API Documentation with Swagger
