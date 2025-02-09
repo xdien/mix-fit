@@ -116,7 +116,7 @@ export class DeviceTelemetryController {
 
       const handler = this.deviceRegistryService.getHandler(deviceType);
       const transformedData: TelemetryPayloadDto = handler
-        ? ((await handler.transformTelemetry(message)) as TelemetryPayloadDto)
+        ? await handler.transformTelemetry(message)
         : message;
 
       await this.telemetryService.saveTelemetryBatch(transformedData);
