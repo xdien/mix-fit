@@ -27,7 +27,6 @@ import { WebsocketModule } from './websocket/websocket.module';
 })
 export class AppModule {
   static async register(): Promise<DynamicModule> {
-    console.log('1. Starting module registration');
     const baseImports = [
       ClsModule.forRoot({
         global: true,

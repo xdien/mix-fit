@@ -1,49 +1,70 @@
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 
 import type { DynamicModule } from '@nestjs/common';
-import { Logger } from '@nestjs/common';
 
 export class ModuleLoader {
-  private static logger = new Logger('ModuleLoader');
-
   static async loadPrivateModule(
     modulePath: string,
-    moduleConfig: any,
+    config: { enable: boolean; config: any },
   ): Promise<DynamicModule | null> {
+    console.log('Trying to load module from:', modulePath);
+    console.log('Current directory:', process.cwd());
+
+    const tsPath = `${modulePath}.ts`;
+    const jsPath = `${modulePath}.js`;
+    const distJsPath = modulePath
+      .replace('src/', 'dist/')
+      .replace('.ts', '.js');
+
+    console.log('Checking paths:', {
+      tsPath,
+      jsPath,
+      distJsPath,
+      tsExists: fs.existsSync(tsPath),
+      jsExists: fs.existsSync(jsPath),
+      distExists: fs.existsSync(distJsPath),
+    });
+
     try {
-      // Kiểm tra xem module có tồn tại không
-      const fullPath = path.join(process.cwd(), modulePath);
-
-      if (!fs.existsSync(fullPath)) {
-        this.logger.log(`Module at ${modulePath} does not exist, skipping...`);
+      if (
+        !fs.existsSync(tsPath) &&
+        !fs.existsSync(jsPath) &&
+        !fs.existsSync(distJsPath)
+      ) {
+        console.log(`Module at ${modulePath} does not exist`);
 
         return null;
       }
 
-      // Dynamic import module
-      const module = await import(fullPath);
-      const moduleKeys = Object.keys(module);
+      let moduleFile;
 
-      if (moduleKeys.length === 0) {
-        throw new Error(`Module at ${modulePath} does not export any classes`);
+      if (fs.existsSync(distJsPath)) {
+        moduleFile = await import(distJsPath);
+      } else if (fs.existsSync(jsPath)) {
+        moduleFile = await import(jsPath);
+      } else {
+        moduleFile = await import(tsPath);
       }
 
-      const ModuleClass = module[moduleKeys[0] as keyof typeof module];
-
-      if (!ModuleClass?.register) {
-        this.logger.warn(
-          `Module at ${modulePath} does not have register method`,
+      if (!moduleFile?.default) {
+        throw new Error(
+          `Module at ${modulePath} does not have a default export`,
         );
+      }
+
+      const ModuleClass = moduleFile.default;
+
+      if (!config.enable) {
+        console.log('Module is disabled via config');
 
         return null;
       }
 
-      return ModuleClass.register(moduleConfig);
+      return ModuleClass.register
+        ? ModuleClass.register(config.config)
+        : { module: ModuleClass };
     } catch (error) {
-      this.logger.warn(
-        `Failed to load module at ${modulePath}: ${error.message}`,
-      );
+      console.error('Error loading module:', error);
 
       return null;
     }
