@@ -16,6 +16,11 @@ Mix-Fit is an integration platform built following Clean Architecture principles
 - API Documentation with Swagger
 - TypeScript for type safety
 
+### TODO
+
+- Dependency Injection for loose coupling
+- Domain-Driven Design (DDD) for business logic modeling
+
 ## Project Structure
 
 ```
