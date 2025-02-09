@@ -27,13 +27,15 @@ import { TranslationInterceptor } from './interceptors/translation-interceptor.s
 // import { MqttService } from './mqtt/mqtt.service';
 import { setupSwagger } from './setup-swagger';
 import { ApiConfigService } from './shared/services/api-config.service';
-import { TranslationService } from './shared/services/translation.service';
 import { SharedModule } from './shared/shared.module';
+import { TranslationModule } from './translation/translation.module';
+import { TranslationService } from './translation/translation.service';
 
 export async function bootstrap(): Promise<NestExpressApplication> {
   initializeTransactionalContext();
+  const moduleRef = await AppModule.register();
   const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
+    moduleRef,
     new ExpressAdapter(),
     { cors: true },
   );
@@ -55,7 +57,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(reflector),
     new TranslationInterceptor(
-      app.select(SharedModule).get(TranslationService),
+      app.select(TranslationModule).get(TranslationService),
     ),
   );
 
