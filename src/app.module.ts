@@ -7,10 +7,14 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClsModule } from 'nestjs-cls';
 import { DataSource } from 'typeorm';
-import { addTransactionalDataSource } from 'typeorm-transactional';
+import {
+  addTransactionalDataSource,
+  getDataSourceByName,
+} from 'typeorm-transactional';
 
 import { ModuleLoader } from './common/module.loader';
 import { PRIVATE_MODULES } from './config/private-modules.config';
+import { DataSourceNameEnum } from './constants/datasoure-name';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
 import { IotModule } from './modules/iot/iot.module';
@@ -51,6 +55,29 @@ export class AppModule {
           addTransactionalDataSource(dataSource);
 
           return dataSource;
+        },
+        inject: [ApiConfigService],
+      }),
+      TypeOrmModule.forRootAsync({
+        name: DataSourceNameEnum.CMS,
+        useFactory: (configService: ApiConfigService) => ({
+          ...configService.cmsMariaDbConfig,
+          name: DataSourceNameEnum.CMS,
+        }),
+        dataSourceFactory: async (options) => {
+          if (!options) {
+            throw new Error('DataSource options are undefined');
+          }
+
+          const existingDataSource = getDataSourceByName(
+            DataSourceNameEnum.CMS,
+          );
+
+          if (existingDataSource) {
+            return existingDataSource;
+          }
+
+          return await new DataSource(options).initialize();
         },
         inject: [ApiConfigService],
       }),
