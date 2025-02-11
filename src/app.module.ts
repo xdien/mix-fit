@@ -58,29 +58,33 @@ export class AppModule {
         },
         inject: [ApiConfigService],
       }),
-      TypeOrmModule.forRootAsync({
-        name: DataSourceNameEnum.CMS,
-        useFactory: (configService: ApiConfigService) => ({
-          ...configService.cmsMariaDbConfig,
-          name: DataSourceNameEnum.CMS,
-        }),
-        dataSourceFactory: async (options) => {
-          if (!options) {
-            throw new Error('DataSource options are undefined');
-          }
+      ...(process.env.CMS_ENABLE === 'true'
+        ? [
+            TypeOrmModule.forRootAsync({
+              name: DataSourceNameEnum.CMS,
+              useFactory: (configService: ApiConfigService) => ({
+                ...configService.cmsMariaDbConfig,
+                name: DataSourceNameEnum.CMS,
+              }),
+              dataSourceFactory: async (options) => {
+                if (!options) {
+                  throw new Error('DataSource options are undefined');
+                }
 
-          const existingDataSource = getDataSourceByName(
-            DataSourceNameEnum.CMS,
-          );
+                const existingDataSource = getDataSourceByName(
+                  DataSourceNameEnum.CMS,
+                );
 
-          if (existingDataSource) {
-            return existingDataSource;
-          }
+                if (existingDataSource) {
+                  return existingDataSource;
+                }
 
-          return await new DataSource(options).initialize();
-        },
-        inject: [ApiConfigService],
-      }),
+                return new DataSource(options).initialize();
+              },
+              inject: [ApiConfigService],
+            }),
+          ]
+        : []),
       BullModule.forRootAsync({
         useFactory: () => {
           const logger = new Logger('BullModule');
