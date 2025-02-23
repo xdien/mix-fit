@@ -12,6 +12,8 @@ import { Ctx, EventPattern, MqttContext, Payload } from '@nestjs/microservices';
 import {
   ApiExtraModels,
   ApiOperation,
+  ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -19,6 +21,7 @@ import {
 import { RoleType } from '../../../constants';
 import { Auth } from '../../../decorators';
 import { MetricDto, TelemetryPayloadDto } from '../dtos/telemetry.dto';
+import { TelemetryAggregateResponseDto } from '../dtos/telemetry-aggregate-response.dto';
 import {
   DeviceStatusEventDto,
   IoTEvents,
@@ -76,21 +79,73 @@ export class DeviceTelemetryController {
 
   @Get(':deviceId/history/:metricName')
   @Auth([RoleType.USER])
-  @ApiOperation({ summary: 'Get metric history for device' })
+  @ApiOperation({
+    summary: 'Get aggregated telemetry data',
+    description:
+      'Retrieves aggregated telemetry data for a specific device and metric',
+  })
+  @ApiParam({
+    name: 'deviceId',
+    description: 'ID of the device',
+    required: true,
+    type: String,
+    example: 'esp8266_001',
+  })
+  @ApiParam({
+    name: 'metricName',
+    description: 'Name of the metric to aggregate',
+    required: true,
+    type: String,
+    example: 'temperature',
+  })
+  @ApiQuery({
+    name: 'startTime',
+    description: 'Start time for the data range (ISO format)',
+    required: true,
+    type: Date,
+    example: '2024-02-23T00:00:00.000Z',
+  })
+  @ApiQuery({
+    name: 'endTime',
+    description: 'End time for the data range (ISO format)',
+    required: true,
+    type: Date,
+    example: '2024-02-23T23:59:59.999Z',
+  })
+  @ApiQuery({
+    name: 'aggregateSeconds',
+    description: 'Time bucket size in second for aggregation',
+    required: false,
+    type: Number,
+    example: 5,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully retrieved aggregated telemetry data',
+    type: [TelemetryAggregateResponseDto],
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid parameters',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Device or metric not found',
+  })
   async getMetricHistory(
     @Param('deviceId') deviceId: string,
     @Param('metricName') metricName: string,
     @Query('startTime') startTime: string,
     @Query('endTime') endTime: string,
-    @Query('aggregateMinutes', new ParseIntPipe({ optional: true }))
-    aggregateMinutes?: number,
+    @Query('aggregateSeconds', new ParseIntPipe({ optional: true }))
+    aggregateSeconds?: number,
   ) {
     return this.telemetryService.getMetricHistory(
       deviceId,
       metricName,
       new Date(startTime),
       new Date(endTime),
-      aggregateMinutes,
+      aggregateSeconds,
     );
   }
 
