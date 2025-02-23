@@ -88,18 +88,20 @@ export class DeviceTelemetryService {
       });
 
     if (aggregateMinutes) {
-      // Sử dụng time_bucket của TimescaleDB nếu có
+      const timeField = `time_bucket('${aggregateMinutes} minute', t.created_at)`;
+
       return query
         .select([
-          `time_bucket('${aggregateMinutes} minutes', t.created_at) as time`,
+          `${timeField} as time`,
           't.metric_name',
           'AVG(t.numeric_value) as avg_value',
           'MAX(t.numeric_value) as max_value',
           'MIN(t.numeric_value) as min_value',
           'COUNT(*) as sample_count',
         ])
-        .groupBy('time_bucket, t.metric_name')
-        .orderBy('time_bucket', 'ASC')
+        .groupBy(timeField)
+        .addGroupBy('t.metric_name')
+        .orderBy('time', 'ASC')
         .getRawMany();
     }
 

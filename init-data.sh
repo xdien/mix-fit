@@ -11,6 +11,7 @@ fi
 psql -v ON_ERROR_STOP=1 --username "postgres" <<-EOSQL
     -- Restrict postgres user to only local connections
     ALTER USER postgres WITH PASSWORD '${POSTGRES_PASSWORD}';
+    CREATE EXTENSION IF NOT EXISTS timescaledb;
     
     -- Create main app user if not exists
     DO \$\$ 
