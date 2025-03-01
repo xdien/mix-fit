@@ -58,7 +58,7 @@ export class AppModule {
         },
         inject: [ApiConfigService],
       }),
-      ...(process.env.CMS_ENABLE === 'true'
+      ...(process.env.CMS_ENABLED === 'true'
         ? [
             TypeOrmModule.forRootAsync({
               name: DataSourceNameEnum.CMS,
@@ -134,6 +134,7 @@ export class AppModule {
     // Load private modules
     const privateModules = await Promise.all(
       PRIVATE_MODULES.map(async (moduleInfo) => {
+        console.log('Module config key', moduleInfo.configKey);
         const moduleConfig = {
           enable: process.env[moduleInfo.configKey] === 'true',
           config: {},

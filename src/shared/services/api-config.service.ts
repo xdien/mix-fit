@@ -115,11 +115,11 @@ export class ApiConfigService {
       __dirname + '/../../modules/cms/tai-khoan/*.entity{.ts,.js}',
       __dirname + '/../../modules/cms/tai-khoan/*.view-entity{.ts,.js}',
     ];
-    // const migrations = [__dirname + '/../../database/migrations/*{.ts,.js}'];
+    const migrations = [__dirname + '/../../database/migrations/*{.ts,.js}'];
 
     return {
       entities,
-      //   migrations,
+      migrations,
       keepConnectionAlive: !this.isTest,
       dropSchema: this.isTest,
       type: this.getString('CMS_DB_TYPE') as any,
