@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { DeviceDto } from 'modules/iot/dtos/device.dto';
 
-import { RoleType } from '../../../constants';
+import { UserRoleEnum } from '../../../constants';
 import { Auth, AuthUser } from '../../../decorators';
 import { UserEntity } from '../../user/user.entity';
 import { DeviceService } from '../services/device.service';
@@ -13,7 +13,7 @@ export class DeviceController {
   constructor(private readonly deviceService: DeviceService) {}
 
   @Get()
-  @Auth([RoleType.USER])
+  @Auth([UserRoleEnum.USER])
   @ApiOperation({ summary: 'Get all devices' })
   getDevices(@AuthUser() user: UserEntity): Promise<DeviceDto[]> {
     return this.deviceService.getUserDevices(user.id);

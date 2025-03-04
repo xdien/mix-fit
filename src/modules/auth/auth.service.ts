@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import { validateHash } from '../../common/utils';
-import type { RoleType } from '../../constants';
+import type { UserRoleEnum } from '../../constants';
 import { TokenType } from '../../constants';
 import { UserNotFoundException } from '../../exceptions';
 import { ApiConfigService } from '../../shared/services/api-config.service';
@@ -20,7 +20,7 @@ export class AuthService {
   ) {}
 
   async createAccessToken(data: {
-    roles: [RoleType];
+    roles: [UserRoleEnum];
     userId: Uuid;
   }): Promise<TokenPayloadDto> {
     return new TokenPayloadDto({

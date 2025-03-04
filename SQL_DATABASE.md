@@ -13,3 +13,9 @@ sed -i 's/\r//g' src/database/sql/iot/mix-mash.sql
 ```bash
 yarn migration:query "$(cat src/database/sql/iot/mix-mash.sql)"
 ```
+
+- Discover the migration id
+
+```bash
+npx typeorm-model-generator
+```

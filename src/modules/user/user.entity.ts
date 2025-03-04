@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 
 import { AbstractWithIdEntity } from '../../common/abstract-with-id.entity';
-import { RoleType } from '../../constants';
+import { UserRoleEnum } from '../../constants';
 import { UseDto } from '../../decorators';
 import { DeviceEntity } from '../iot/entity/device.entity';
 import { PostEntity } from '../post/post.entity';
@@ -20,11 +20,11 @@ export class UserEntity extends AbstractWithIdEntity<UserDto, UserDtoOptions> {
 
   @Column({
     type: 'enum',
-    enum: RoleType,
-    default: [RoleType.USER],
+    enum: UserRoleEnum,
+    default: [UserRoleEnum.USER],
     array: true,
   })
-  roles!: [RoleType];
+  roles!: [UserRoleEnum];
 
   @Column({ unique: true, nullable: true, type: 'varchar' })
   email?: string | null;

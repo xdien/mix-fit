@@ -18,7 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { RoleType } from '../../../constants';
+import { UserRoleEnum } from '../../../constants';
 import { Auth } from '../../../decorators';
 import { MetricDto, TelemetryPayloadDto } from '../dtos/telemetry.dto';
 import { TelemetryAggregateResponseDto } from '../dtos/telemetry-aggregate-response.dto';
@@ -42,7 +42,7 @@ export class DeviceTelemetryController {
   ) {}
 
   @Post()
-  @Auth([RoleType.USER])
+  @Auth([UserRoleEnum.USER])
   @ApiOperation({ summary: 'Save device telemetry data' })
   @ApiOperation({
     summary: 'Save device telemetry data',
@@ -66,7 +66,7 @@ export class DeviceTelemetryController {
   }
 
   @Get(':deviceId/latest')
-  @Auth([RoleType.USER])
+  @Auth([UserRoleEnum.USER])
   @ApiOperation({ summary: 'Get latest metrics for device' })
   async getLatestMetrics(
     @Param('deviceId') deviceId: string,
@@ -78,7 +78,7 @@ export class DeviceTelemetryController {
   }
 
   @Get(':deviceId/history/:metricName')
-  @Auth([RoleType.USER])
+  @Auth([UserRoleEnum.USER])
   @ApiOperation({
     summary: 'Get aggregated telemetry data',
     description:

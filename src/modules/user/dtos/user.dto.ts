@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 import { AbstractWithIdDto } from '../../../common/dto/abstract-with-id.dto';
-import { RoleType } from '../../../constants';
+import { UserRoleEnum } from '../../../constants';
 import {
   BooleanFieldOptional,
   EmailField,
@@ -23,12 +23,12 @@ export class UserDto extends AbstractWithIdDto {
   username!: string;
 
   @ApiProperty({
-    enum: RoleType,
+    enum: UserRoleEnum,
     isArray: true, // fix: Null check operator used on a null value
     description: 'User roles array',
   })
-  @EnumField(() => RoleType)
-  roles!: [RoleType];
+  @EnumField(() => UserRoleEnum)
+  roles!: [UserRoleEnum];
 
   @EmailField()
   email!: string | null | undefined;

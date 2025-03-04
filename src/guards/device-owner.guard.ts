@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
-import { RoleType } from '../constants';
+import { UserRoleEnum } from '../constants';
 import { DeviceService } from '../modules/iot/services/device.service';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class DeviceOwnerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<{
       params: { deviceId: string };
-      user: { roles: RoleType[]; id: string } | undefined;
+      user: { roles: UserRoleEnum[]; id: string } | undefined;
     }>();
     this.logger.debug('UserId in', request.user?.id);
     const user = request.user;
@@ -33,8 +33,8 @@ export class DeviceOwnerGuard implements CanActivate {
     const deviceId = request.params.deviceId;
 
     if (
-      user.roles.includes(RoleType.SUPER_ADMIN) ||
-      user.roles.includes(RoleType.IOT_ADMIN)
+      user.roles.includes(UserRoleEnum.SUPER_ADMIN) ||
+      user.roles.includes(UserRoleEnum.IOT_ADMIN)
     ) {
       return true;
     }
