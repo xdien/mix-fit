@@ -114,6 +114,7 @@ export class ApiConfigService {
     const entities = [
       __dirname + '/../../modules/cms/tai-khoan/*.entity{.ts,.js}',
       __dirname + '/../../modules/cms/tai-khoan/*.view-entity{.ts,.js}',
+      __dirname + '/../../modules/cms/entities/*{.ts,.js}',
     ];
     const migrations = [__dirname + '/../../database/migrations/*{.ts,.js}'];
 
