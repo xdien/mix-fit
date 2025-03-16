@@ -20,7 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { RoleType } from '../../constants';
+import { UserRoleEnum } from '../../constants';
 import { Auth, AuthUser } from '../../decorators';
 import { IFile } from '../../interfaces';
 import { UserDto } from '../user/dtos/user.dto';
@@ -132,7 +132,7 @@ export class AuthController {
   @Version('1')
   @Get('me')
   @HttpCode(HttpStatus.OK)
-  @Auth([RoleType.USER, RoleType.ADMIN])
+  @Auth([UserRoleEnum.USER, UserRoleEnum.ADMIN])
   @ApiOkResponse({ type: UserDto, description: 'current user info' })
   getCurrentUser(@AuthUser() user: UserEntity): UserDto {
     return user.toDto();

@@ -9,7 +9,7 @@ import {
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import type { PageDto } from '../../common/dto/page.dto';
-import { RoleType } from '../../constants';
+import { UserRoleEnum } from '../../constants';
 import { ApiPageResponse, Auth, AuthUser, UUIDParam } from '../../decorators';
 import { UseLanguageInterceptor } from '../../interceptors/language-interceptor.service';
 import { TranslationService } from '../../translation/translation.service';
@@ -27,7 +27,7 @@ export class UserController {
   ) {}
 
   @Get('admin')
-  @Auth([RoleType.USER])
+  @Auth([UserRoleEnum.USER])
   @HttpCode(HttpStatus.OK)
   @UseLanguageInterceptor()
   async admin(@AuthUser() user: UserEntity) {
@@ -41,7 +41,7 @@ export class UserController {
   }
 
   @Get()
-  @Auth([RoleType.USER])
+  @Auth([UserRoleEnum.USER])
   @HttpCode(HttpStatus.OK)
   @ApiPageResponse({
     description: 'Get users list',
@@ -55,7 +55,7 @@ export class UserController {
   }
 
   @Get(':id')
-  @Auth([RoleType.USER])
+  @Auth([UserRoleEnum.USER])
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,

@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Raw } from 'typeorm';
 
-import type { RoleType } from '../../constants';
+import type { UserRoleEnum } from '../../constants';
 import { TokenType } from '../../constants';
 import { ApiConfigService } from '../../shared/services/api-config.service';
 import type { UserEntity } from '../user/user.entity';
@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(args: {
     userId: Uuid;
-    roles: [RoleType];
+    roles: [UserRoleEnum];
     type: TokenType;
   }): Promise<UserEntity> {
     if (args.type !== TokenType.ACCESS_TOKEN) {

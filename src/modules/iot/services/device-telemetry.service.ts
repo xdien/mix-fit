@@ -5,6 +5,7 @@ import { LessThan, Repository } from 'typeorm';
 
 import { SocketService } from '../../../websocket/websocket.service';
 import type { TelemetryPayloadDto } from '../dtos/telemetry.dto';
+import type { TelemetryAggregateResponseDto } from '../dtos/telemetry-aggregate-response.dto';
 import { DeviceTelemetryEntity } from '../entity/device-telemetry.entity';
 
 @Injectable()
@@ -76,8 +77,8 @@ export class DeviceTelemetryService {
     metricName: string,
     startTime: Date,
     endTime: Date,
-    aggregateMinutes?: number,
-  ): Promise<unknown[]> {
+    aggregateSeconds?: number,
+  ): Promise<TelemetryAggregateResponseDto[]> {
     const query = this.telemetryRepo
       .createQueryBuilder('t')
       .where('t.device_id = :deviceId', { deviceId })
@@ -87,23 +88,34 @@ export class DeviceTelemetryService {
         endTime,
       });
 
-    if (aggregateMinutes) {
-      // Sử dụng time_bucket của TimescaleDB nếu có
+    if (aggregateSeconds) {
+      const timeField = `time_bucket('${aggregateSeconds} second', t.created_at)`;
+
       return query
         .select([
-          `time_bucket('${aggregateMinutes} minutes', t.created_at) as time`,
+          `${timeField} as time`,
           't.metric_name',
           'AVG(t.numeric_value) as avg_value',
           'MAX(t.numeric_value) as max_value',
           'MIN(t.numeric_value) as min_value',
           'COUNT(*) as sample_count',
         ])
-        .groupBy('time_bucket, t.metric_name')
-        .orderBy('time_bucket', 'ASC')
+        .groupBy(timeField)
+        .addGroupBy('t.metric_name')
+        .orderBy('time', 'ASC')
         .getRawMany();
     }
 
-    return query.orderBy('t.created_at', 'ASC').getMany();
+    const telemetryData = await query.orderBy('t.created_at', 'ASC').getMany();
+
+    return telemetryData.map((t) => ({
+      time: t.time.toISOString(),
+      metricName: t.metricName ?? '',
+      avgValue: t.numericValue,
+      maxValue: t.numericValue,
+      minValue: t.numericValue,
+      sampleCount: 1,
+    }));
   }
 
   async deleteOldData(retentionDays: number): Promise<void> {

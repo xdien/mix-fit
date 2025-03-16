@@ -112,15 +112,15 @@ export class ApiConfigService {
 
   get cmsMariaDbConfig(): TypeOrmModuleOptions {
     const entities = [
-      __dirname + '/../../modules/tai-khoan/*.entity{.ts,.js}',
-      __dirname + '/../../modules/tai-khoan/*.view-entity{.ts,.js}',
+      __dirname + '/../../modules/cms/tai-khoan/*.entity{.ts,.js}',
+      __dirname + '/../../modules/cms/tai-khoan/*.view-entity{.ts,.js}',
+      __dirname + '/../../modules/cms/entities/*{.ts,.js}',
     ];
-    // const migrations = [__dirname + '/../../database/migrations/*{.ts,.js}'];
-    Logger.log(entities);
+    const migrations = [__dirname + '/../../database/migrations/*{.ts,.js}'];
 
     return {
       entities,
-      //   migrations,
+      migrations,
       keepConnectionAlive: !this.isTest,
       dropSchema: this.isTest,
       type: this.getString('CMS_DB_TYPE') as any,
@@ -131,7 +131,7 @@ export class ApiConfigService {
       password: this.getString('CMS_DB_PASSWORD'),
       database: this.getString('CMS_DB_DATABASE'),
       subscribers: [],
-      migrationsRun: true,
+      migrationsRun: false,
       logging: this.getBoolean('ENABLE_ORM_LOGS'),
       namingStrategy: new SnakeNamingStrategy(),
     };
