@@ -157,7 +157,18 @@ npm install
 yarn install
 ```
 
-### 4.2 Handle dependency issues (if any)
+### 4.2 Setup Husky (Git Hooks)
+
+```bash
+# Husky is automatically set up during npm install via prepare script
+# Just ensure pre-commit hook is executable and uses npm
+chmod +x .husky/pre-commit
+
+# Test the pre-commit hook
+npx lint-staged
+```
+
+### 4.3 Handle dependency issues (if any)
 
 ```bash
 # If you encounter vulnerabilities
@@ -251,6 +262,25 @@ npm run lint
 npm run lint:fix
 ```
 
+### 8.3 Git Hooks (Husky)
+
+The project uses Husky for git hooks to ensure code quality:
+
+```bash
+# Setup Husky (run once after npm install)
+npx husky install
+
+# Test pre-commit hook manually
+npx lint-staged
+
+# Pre-commit hook will automatically:
+# - Run ESLint on TypeScript files
+# - Format JSON files
+# - Stage fixed files
+```
+
+**Note**: If you encounter issues with git commits, check the troubleshooting section for Husky fixes.
+
 ## Project Structure
 
 ```
@@ -275,6 +305,7 @@ src/
 # Setup
 ./scripts/generate-jwt-keys.sh    # Generate JWT RSA keys (Linux/Mac)
 .\scripts\generate-jwt-keys.ps1   # Generate JWT RSA keys (Windows)
+./scripts/fix-husky.sh          # Fix Husky git hooks setup
 
 # Development
 npm run watch:dev          # Hot reload development
@@ -345,7 +376,30 @@ sudo cp mosquitto/config/.mosquitto_passwd_example mosquitto/config/.mosquitto_p
 # Ensure \n is present and no extra whitespace
 ```
 
-### 5. Port Conflicts
+### 5. Husky/Git Hooks Issues
+
+```bash
+# Quick fix using automated script
+./scripts/fix-husky.sh
+
+# Or manual fix:
+# Error: yarn command not found in pre-commit hook
+# Fix: Update .husky/pre-commit to use npm instead of yarn
+echo "npx lint-staged" > .husky/pre-commit
+
+# Error: Husky deprecated warnings
+# Remove deprecated lines from .husky/pre-commit:
+# #!/bin/sh
+# . "$(dirname "$0")/_/husky.sh"
+
+# Ensure pre-commit hook is executable
+chmod +x .husky/pre-commit
+
+# Test pre-commit hook manually
+npx lint-staged
+```
+
+### 6. Port Conflicts
 
 If you encounter port already in use errors:
 
