@@ -6,8 +6,7 @@ module.exports = {
         return filesToLint.length > 0 ? ['eslint --fix', 'git add'] : [];
     },
     '{!(package)*.json,*.code-snippets,.!(browserslist)*rc}': [
-        'npm run lint:fix --parser json',
+        'prettier --write',
     ],
-    //   'package.json': ['npm run lint:fix'],
-    //   '*.md': ['npm run lint:fix'],
+    '*.md': ['prettier --write'],
 };

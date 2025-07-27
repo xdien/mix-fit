@@ -65,19 +65,22 @@ git clone git@github.com:xdien/mix-fit.git
 # 2. Navigate to directory
 cd mix-fit
 
-# 3. Setup environment and JWT keys
+# 3. Install Yarn (if not already installed)
+npm install -g yarn
+
+# 4. Setup environment and JWT keys
 cp .env.example .env
 ./scripts/generate-jwt-keys.sh  # Generate JWT keys
 
-# 4. Install dependencies
-npm install
+# 5. Install dependencies
+yarn install
 
-# 5. Start services and run migrations
+# 6. Start services and run migrations
 docker compose up -d postgres-db redis
-npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./src/datasources/default.datasource.ts
+yarn migration:run
 
-# 6. Start development server
-npm run watch:dev
+# 7. Start development server
+yarn watch:dev
 ```
 
 ## Development
@@ -91,7 +94,7 @@ For complete development setup including JWT configuration, Docker services, and
 docker compose up -d postgres-db redis
 
 # Run application in development mode
-npm run watch:dev
+yarn watch:dev
 
 # API documentation available at: http://localhost:3000/documentation
 ```
@@ -100,10 +103,10 @@ npm run watch:dev
 
 ```bash
 # Generate new migration
-npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ./src/datasources/default.datasource.ts MigrationName
+yarn migration:generate MigrationName
 
 # Run migrations
-npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./src/datasources/default.datasource.ts
+yarn migration:run
 ```
 
 For detailed database setup and troubleshooting, see: **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)**
@@ -134,9 +137,11 @@ yarn build:prod
 ## Documentation
 
 ### Development Setup
+
 - **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)** - Complete development environment setup guide
 
 ### Additional Documentation
+
 Detailed documentation available in `docs/` directory:
 
 1. [Architecture & Design](docs/architecture.md)

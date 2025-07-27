@@ -5,21 +5,26 @@
 
 echo "Fixing Husky configuration..."
 
-# Remove deprecated Husky setup from pre-commit hook
+# Check if yarn is installed
+if ! command -v yarn &> /dev/null; then
+    echo "Yarn is not installed. Installing yarn globally..."
+    npm install -g yarn
+fi
+
+# Restore proper Husky pre-commit hook (new format without deprecated lines)
 echo "Updating .husky/pre-commit..."
-echo "npx lint-staged" > .husky/pre-commit
+cat > .husky/pre-commit << 'EOF'
+yarn lint-staged
+EOF
 
 # Make pre-commit hook executable
 chmod +x .husky/pre-commit
-
-# Ensure hook is executable
-echo "Making pre-commit hook executable..."
 
 echo ""
 echo "Husky configuration fixed successfully!"
 echo ""
 echo "Testing pre-commit hook..."
-npx lint-staged
+yarn lint-staged
 
 echo ""
 echo "If the test passed, Husky is now properly configured."

@@ -4,9 +4,12 @@
   "prettier.requireConfig": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
-},
+  },
   "cSpell.words": ["Injectable", "microservices", "nestjs", "postgres"],
   "editor.detectIndentation": false,
   "rift.autostart": false,
-  "i18n-ally.localesPaths": ["src/i18n"]
+  "i18n-ally.localesPaths": ["src/i18n"],
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }

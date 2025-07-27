@@ -7,11 +7,12 @@ Mix-Fit is an integration platform built following Clean Architecture principles
 ## System Requirements
 
 - **Node.js**: >= 18.x
-- **npm**: >= 8.x (or yarn >= 1.22)
+- **Yarn**: >= 1.22 (Package manager)
 - **Docker**: >= 20.x
 - **Docker Compose**: >= 2.x
 - **Git**: >= 2.x
 - **OpenSSL**: For JWT key generation
+- **VS Code**: Latest version (if using VS Code as editor)
 
 ## Step 1: Clone Repository
 
@@ -22,6 +23,53 @@ git clone git@github.com:xdien/mix-fit.git
 # Navigate to project directory
 cd mix-fit
 ```
+
+## Step 1.5: VS Code Extensions (if using VS Code)
+
+Install the following required extensions for optimal development experience:
+
+### Required Extensions:
+
+```bash
+# Install via VS Code Extensions marketplace or command line:
+
+# Prettier - Code formatter
+code --install-extension esbenp.prettier-vscode
+
+# ESLint - JavaScript/TypeScript linting
+code --install-extension dbaeumer.vscode-eslint
+
+# TypeScript support (usually pre-installed)
+code --install-extension ms-vscode.vscode-typescript-next
+```
+
+### Recommended Extensions:
+
+```bash
+# i18n Ally - Internationalization support
+code --install-extension lokalise.i18n-ally
+
+# Code Spell Checker
+code --install-extension streetsidesoftware.code-spell-checker
+
+# Docker support
+code --install-extension ms-azuretools.vscode-docker
+
+# GitLens - Enhanced Git capabilities
+code --install-extension eamodio.gitlens
+
+# Thunder Client - API testing (alternative to Postman)
+code --install-extension rangav.vscode-thunder-client
+```
+
+### Manual Installation:
+
+1. Open VS Code
+2. Go to Extensions (Ctrl+Shift+X / Cmd+Shift+X)
+3. Search for each extension name
+4. Click "Install"
+
+**Note**: The project's `.vscode/settings.json` is configured to work with these extensions.
 
 ## Step 2: Environment Setup
 
@@ -39,6 +87,7 @@ The project uses RSA keys to sign and verify JWT tokens. You can generate keys i
 #### Method 1: Using automated script (Recommended)
 
 **On macOS/Linux:**
+
 ```bash
 # Run automated script
 ./scripts/generate-jwt-keys.sh
@@ -47,6 +96,7 @@ The project uses RSA keys to sign and verify JWT tokens. You can generate keys i
 ```
 
 **On Windows (PowerShell):**
+
 ```powershell
 # Run automated script
 .\scripts\generate-jwt-keys.ps1
@@ -75,7 +125,8 @@ JWT_PUBLIC_KEY=-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0B...\n-----END PUB
 JWT_EXPIRATION_TIME=3600
 ```
 
-**Important notes**: 
+**Important notes**:
+
 - Keep the `\n` in the key strings
 - No extra whitespace
 - Private key must be kept absolutely secure
@@ -145,37 +196,56 @@ docker compose up -d mqtt-broker
 # Change MQTT_ENABLED=false to MQTT_ENABLED=true
 ```
 
-## Step 4: Install Dependencies
+## Step 4: Install Yarn and Dependencies
 
-### 4.1 Using npm
+### 4.1 Install Yarn (if not already installed)
 
 ```bash
-# Install dependencies
-npm install
+# Install Yarn globally using npm
+npm install -g yarn
 
-# Or if you have yarn
+# Verify Yarn installation
+yarn --version
+
+# Alternative installation methods:
+# On macOS using Homebrew
+brew install yarn
+
+# On Windows using Chocolatey
+choco install yarn
+
+# On Ubuntu/Debian
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update && sudo apt install yarn
+```
+
+### 4.2 Install Dependencies
+
+```bash
+# Install project dependencies
 yarn install
 ```
 
-### 4.2 Setup Husky (Git Hooks)
+### 4.3 Setup Husky (Git Hooks)
 
 ```bash
-# Husky is automatically set up during npm install via prepare script
-# Just ensure pre-commit hook is executable and uses npm
+# Husky is automatically set up during yarn install via prepare script
+# Just ensure pre-commit hook is executable
 chmod +x .husky/pre-commit
 
 # Test the pre-commit hook
-npx lint-staged
+yarn lint-staged
 ```
 
-### 4.3 Handle dependency issues (if any)
+### 4.4 Handle dependency issues (if any)
 
 ```bash
 # If you encounter vulnerabilities
-npm audit fix
+yarn audit
 
-# Or force fix (be careful)
-npm audit fix --force
+# Fix vulnerabilities (if possible)
+yarn audit fix
 ```
 
 ## Step 5: Database Setup
@@ -184,14 +254,14 @@ npm audit fix --force
 
 ```bash
 # Run migrations to create database schema
-npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./src/datasources/default.datasource.ts
+yarn migration:run
 ```
 
 ### 5.2 Create new migration (when needed)
 
 ```bash
 # Create new migration
-npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ./src/datasources/default.datasource.ts MigrationName
+yarn migration:generate MigrationName
 ```
 
 ## Step 6: Start Application
@@ -200,17 +270,17 @@ npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:g
 
 ```bash
 # Start with hot reload
-npm run watch:dev
+yarn watch:dev
 
 # Or
-npm run start:dev
+yarn start:dev
 ```
 
 ### 6.2 Debug mode
 
 ```bash
 # Start with debug mode
-npm run debug:dev
+yarn debug:dev
 ```
 
 ## Step 7: Verify Application
@@ -229,6 +299,7 @@ curl http://localhost:3000/health
 ### 7.3 Database Management
 
 - **PgAdmin**: http://localhost:8080
+
   - Email: example@gmail.com
   - Password: password
 
@@ -240,26 +311,26 @@ curl http://localhost:3000/health
 
 ```bash
 # Run all tests
-npm test
+yarn test
 
 # Run tests with watch mode
-npm run test:watch
+yarn test:watch
 
 # Run test coverage
-npm run test:cov
+yarn test:cov
 
 # Run e2e tests
-npm run test:e2e
+yarn test:e2e
 ```
 
 ### 8.2 Linting and Formatting
 
 ```bash
 # Run linting
-npm run lint
+yarn lint
 
 # Fix linting issues
-npm run lint:fix
+yarn lint:fix
 ```
 
 ### 8.3 Git Hooks (Husky)
@@ -267,11 +338,8 @@ npm run lint:fix
 The project uses Husky for git hooks to ensure code quality:
 
 ```bash
-# Setup Husky (run once after npm install)
-npx husky install
-
 # Test pre-commit hook manually
-npx lint-staged
+yarn lint-staged
 
 # Pre-commit hook will automatically:
 # - Run ESLint on TypeScript files
@@ -308,26 +376,26 @@ src/
 ./scripts/fix-husky.sh          # Fix Husky git hooks setup
 
 # Development
-npm run watch:dev          # Hot reload development
-npm run debug:dev          # Debug mode
-npm run start:dev          # Simple development start
+yarn watch:dev             # Hot reload development
+yarn debug:dev             # Debug mode
+yarn start:dev             # Simple development start
 
 # Build
-npm run build:prod         # Production build
+yarn build:prod            # Production build
 
 # Database
-npm run migration:generate # Create new migration
-npm run migration:run      # Run migrations
-npm run migration:revert   # Revert migration
+yarn migration:generate    # Create new migration
+yarn migration:run         # Run migrations
+yarn migration:revert      # Revert migration
 
 # Testing
-npm test                   # Run tests
-npm run test:watch         # Watch mode
-npm run test:cov          # Coverage report
+yarn test                  # Run tests
+yarn test:watch            # Watch mode
+yarn test:cov             # Coverage report
 
 # Code Quality
-npm run lint              # Linting
-npm run lint:fix          # Fix linting issues
+yarn lint                  # Linting
+yarn lint:fix             # Fix linting issues
 ```
 
 ## Troubleshooting
@@ -379,27 +447,47 @@ sudo cp mosquitto/config/.mosquitto_passwd_example mosquitto/config/.mosquitto_p
 ### 5. Husky/Git Hooks Issues
 
 ```bash
-# Quick fix using automated script
+# Error: yarn command not found
+# Install yarn globally first
+npm install -g yarn
+
+# Error: Husky deprecated warnings or lint:prettier command not found
+# Run the fix script
 ./scripts/fix-husky.sh
 
 # Or manual fix:
-# Error: yarn command not found in pre-commit hook
-# Fix: Update .husky/pre-commit to use npm instead of yarn
-echo "npx lint-staged" > .husky/pre-commit
-
-# Error: Husky deprecated warnings
-# Remove deprecated lines from .husky/pre-commit:
-# #!/bin/sh
-# . "$(dirname "$0")/_/husky.sh"
-
-# Ensure pre-commit hook is executable
+# Update .husky/pre-commit to new format (remove deprecated lines)
+echo "yarn lint-staged" > .husky/pre-commit
 chmod +x .husky/pre-commit
 
 # Test pre-commit hook manually
-npx lint-staged
+yarn lint-staged
+
+# Check .husky/pre-commit content (should be simple):
+cat .husky/pre-commit
+# Should contain only:
+# yarn lint-staged
 ```
 
-### 6. Port Conflicts
+### 6. VS Code Extension Issues
+
+```bash
+# Error: Prettier extension not found
+# Install Prettier extension
+code --install-extension esbenp.prettier-vscode
+
+# Error: ESLint not working
+# Install ESLint extension
+code --install-extension dbaeumer.vscode-eslint
+
+# Check if extensions are installed
+code --list-extensions
+
+# Reload VS Code window after installing extensions
+# Command Palette (Ctrl+Shift+P) -> "Developer: Reload Window"
+```
+
+### 7. Port Conflicts
 
 If you encounter port already in use errors:
 
@@ -415,19 +503,22 @@ kill -9 [PID]
 ## Development Workflow
 
 1. **Create feature branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 2. **Development**
+
    - Write code
-   - Run tests: `npm test`
-   - Linting: `npm run lint:fix`
+   - Run tests: `yarn test`
+   - Linting: `yarn lint:fix`
 
 3. **Testing**
+
    ```bash
-   npm run test:cov
-   npm run test:e2e
+   yarn test:cov
+   yarn test:e2e
    ```
 
 4. **Commit and Push**
