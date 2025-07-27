@@ -55,8 +55,6 @@ code --install-extension streetsidesoftware.code-spell-checker
 # Docker support
 code --install-extension ms-azuretools.vscode-docker
 
-# GitLens - Enhanced Git capabilities
-code --install-extension eamodio.gitlens
 
 # Thunder Client - API testing (alternative to Postman)
 code --install-extension rangav.vscode-thunder-client
