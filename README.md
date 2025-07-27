@@ -54,6 +54,10 @@ src/
 
 ## Getting Started
 
+For detailed development environment setup, please see: **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)**
+
+### Quick Start
+
 ```bash
 # 1. Clone repository
 git clone git@github.com:xdien/mix-fit.git
@@ -61,18 +65,33 @@ git clone git@github.com:xdien/mix-fit.git
 # 2. Navigate to directory
 cd mix-fit
 
-# 3. Create environment file
-cp .env.example .env
+# 3. Install Yarn (if not already installed)
+npm install -g yarn
 
-# 4. Install dependencies
+# 4. Setup environment and JWT keys
+cp .env.example .env
+./scripts/generate-jwt-keys.sh  # Generate JWT keys
+
+# 5. Install dependencies
 yarn install
+
+# 6. Start services and run migrations
+docker compose up -d postgres-db redis
+yarn migration:run
+
+# 7. Start development server
+yarn watch:dev
 ```
 
 ## Development
 
+For complete development setup including JWT configuration, Docker services, and troubleshooting, see: **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)**
+
+### Quick Development Commands
+
 ```bash
 # Start dependent services
-docker compose up -d
+docker compose up -d postgres-db redis
 
 # Run application in development mode
 yarn watch:dev
@@ -84,11 +103,13 @@ yarn watch:dev
 
 ```bash
 # Generate new migration
-yarn typeorm migration:generate -d ./src/infrastructure/database/datasource.ts migration-name
+yarn migration:generate MigrationName
 
 # Run migrations
-yarn typeorm migration:run
+yarn migration:run
 ```
+
+For detailed database setup and troubleshooting, see: **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)**
 
 ## Build & Deploy
 
@@ -114,6 +135,12 @@ yarn build:prod
 - **Dynamic Module Loading**: Runtime module loading
 
 ## Documentation
+
+### Development Setup
+
+- **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)** - Complete development environment setup guide
+
+### Additional Documentation
 
 Detailed documentation available in `docs/` directory:
 
