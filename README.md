@@ -54,6 +54,10 @@ src/
 
 ## Getting Started
 
+For detailed development environment setup, please see: **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)**
+
+### Quick Start
+
 ```bash
 # 1. Clone repository
 git clone git@github.com:xdien/mix-fit.git
@@ -61,21 +65,33 @@ git clone git@github.com:xdien/mix-fit.git
 # 2. Navigate to directory
 cd mix-fit
 
-# 3. Create environment file
+# 3. Setup environment and JWT keys
 cp .env.example .env
+./scripts/generate-jwt-keys.sh  # Generate JWT keys
 
 # 4. Install dependencies
-yarn install
+npm install
+
+# 5. Start services and run migrations
+docker compose up -d postgres-db redis
+npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./src/datasources/default.datasource.ts
+
+# 6. Start development server
+npm run watch:dev
 ```
 
 ## Development
 
+For complete development setup including JWT configuration, Docker services, and troubleshooting, see: **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)**
+
+### Quick Development Commands
+
 ```bash
 # Start dependent services
-docker compose up -d
+docker compose up -d postgres-db redis
 
 # Run application in development mode
-yarn watch:dev
+npm run watch:dev
 
 # API documentation available at: http://localhost:3000/documentation
 ```
@@ -84,11 +100,13 @@ yarn watch:dev
 
 ```bash
 # Generate new migration
-yarn typeorm migration:generate -d ./src/infrastructure/database/datasource.ts migration-name
+npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d ./src/datasources/default.datasource.ts MigrationName
 
 # Run migrations
-yarn typeorm migration:run
+npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d ./src/datasources/default.datasource.ts
 ```
+
+For detailed database setup and troubleshooting, see: **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)**
 
 ## Build & Deploy
 
@@ -115,6 +133,10 @@ yarn build:prod
 
 ## Documentation
 
+### Development Setup
+- **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)** - Complete development environment setup guide
+
+### Additional Documentation
 Detailed documentation available in `docs/` directory:
 
 1. [Architecture & Design](docs/architecture.md)
