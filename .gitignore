@@ -92,3 +92,4 @@ deployment/mosquitto/config/.mosquitto_passwd
 .diff
 package-lock.json
 yarn.lock
+keys/*
