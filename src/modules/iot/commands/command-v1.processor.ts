@@ -5,7 +5,7 @@ import {
   Processor,
   WorkerHost,
 } from '@nestjs/bullmq';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job, Queue } from 'bullmq';
 import { Repository } from 'typeorm';
@@ -20,15 +20,15 @@ import type {
 
 @Injectable()
 @Processor('iot-commands')
-export class CommandProcessor extends WorkerHost {
-  private readonly logger = new Logger(CommandProcessor.name);
+export class CommandV1Processor extends WorkerHost {
+  private readonly logger = new Logger(CommandV1Processor.name);
 
   constructor(
-    @InjectQueue(QueueNameEnum.REDIS_QUEUE_IOT_V1)
-    private readonly commandV1Queue: Queue<ICommandPayload>,
     @InjectRepository(DeviceEntity)
     private readonly deviceRepository: Repository<DeviceEntity>,
     private readonly commandFactory: CommandFactory,
+    @Optional() @InjectQueue(QueueNameEnum.REDIS_QUEUE_IOT_V1)
+    private readonly commandV1Queue?: Queue<ICommandPayload>,
   ) {
     super();
     this.logger.log('Command processor initialized');
@@ -103,6 +103,10 @@ export class CommandProcessor extends WorkerHost {
   }
 
   async getCommandStatus(jobId: string): Promise<ICommandResponse> {
+    if (!this.commandV1Queue) {
+      throw new Error('Command queue is not available. Redis may be disabled.');
+    }
+
     try {
       const job = await this.commandV1Queue.getJob(jobId);
 
@@ -184,6 +188,11 @@ export class CommandProcessor extends WorkerHost {
     job: Job<ICommandPayload>,
     errorMessage: string,
   ) {
+    if (!this.commandV1Queue) {
+      this.logger.error('Command queue is not available. Redis may be disabled.');
+      return;
+    }
+
     if (job.opts.repeat) {
       //   const repeatOpts = job.opts.repeat;
       await this.commandV1Queue.removeJobScheduler(job.name);

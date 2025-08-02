@@ -85,40 +85,44 @@ export class AppModule {
             }),
           ]
         : []),
-      BullModule.forRootAsync({
-        useFactory: () => {
-          const logger = new Logger('BullModule');
+      ...(process.env.REDIS_CACHE_ENABLED === 'true'
+        ? [
+            BullModule.forRootAsync({
+              useFactory: () => {
+                const logger = new Logger('BullModule');
 
-          return {
-            connection: {
-              host: process.env.REDIS_HOST ?? 'localhost',
-              port: Number(process.env.REDIS_PORT) || 6379,
-              password: process.env.REDIS_PASSWORD,
-            },
-            onError: (error: unknown) => {
-              logger.error('Redis connection error:', error);
-            },
-            beforeClientCreated: () => {
-              logger.debug('Connecting to Redis...', {
-                host: process.env.REDIS_HOST ?? 'localhost',
-                port: Number(process.env.REDIS_PORT) || 6379,
-                hasPassword: Boolean(process.env.REDIS_PASSWORD),
-              });
-            },
-            afterClientCreated: (client: any) => {
-              logger.debug('Redis connected successfully');
-              client
-                .ping()
-                .then(() => {
-                  logger.debug('Redis ping successful');
-                })
-                .catch((error: Error) => {
-                  logger.error('Redis ping failed:', error);
-                });
-            },
-          };
-        },
-      }),
+                return {
+                  connection: {
+                    host: process.env.REDIS_HOST ?? 'localhost',
+                    port: Number(process.env.REDIS_PORT) || 6379,
+                    password: process.env.REDIS_PASSWORD,
+                  },
+                  onError: (error: unknown) => {
+                    logger.error('Redis connection error:', error);
+                  },
+                  beforeClientCreated: () => {
+                    logger.debug('Connecting to Redis...', {
+                      host: process.env.REDIS_HOST ?? 'localhost',
+                      port: Number(process.env.REDIS_PORT) || 6379,
+                      hasPassword: Boolean(process.env.REDIS_PASSWORD),
+                    });
+                  },
+                  afterClientCreated: (client: any) => {
+                    logger.debug('Redis connected successfully');
+                    client
+                      .ping()
+                      .then(() => {
+                        logger.debug('Redis ping successful');
+                      })
+                      .catch((error: Error) => {
+                        logger.error('Redis ping failed:', error);
+                      });
+                  },
+                };
+              },
+            }),
+          ]
+        : []),
     ];
 
     const featureModules = [

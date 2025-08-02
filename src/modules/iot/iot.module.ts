@@ -8,7 +8,8 @@ import { QueueNameEnum } from '../../constants/queue-key';
 import { MqttService } from '../../mqtt/mqtt.service';
 import { SocketService } from '../../websocket/websocket.service';
 import { CommandFactory } from './commands/command.factory';
-import { CommandProcessor } from './commands/command-v1.processor';
+import { CommandProcessor } from './commands/command.processor';
+import { CommandV1Processor } from './commands/command-v1.processor';
 import { IoTCommandController } from './controllers/command.controller';
 import { IoTCommandV1Controller } from './controllers/command-v1.controller';
 import { DeviceTelemetryController } from './controllers/device-telemetry.controller';
@@ -32,12 +33,16 @@ import { DeviceTelemetryService } from './services/device-telemetry.service';
       CommandLogEntity,
       DeviceTelemetryEntity,
     ]),
-    BullModule.registerQueue({
-      name: 'iot-commands',
-    }),
-    BullModule.registerQueue({
-      name: QueueNameEnum.REDIS_QUEUE_IOT_V1,
-    }),
+    ...(process.env.REDIS_CACHE_ENABLED === 'true'
+      ? [
+          BullModule.registerQueue({
+            name: 'iot-commands',
+          }),
+          BullModule.registerQueue({
+            name: QueueNameEnum.REDIS_QUEUE_IOT_V1,
+          }),
+        ]
+      : []),
   ],
   controllers: [
     IoTCommandController,
@@ -59,7 +64,7 @@ import { DeviceTelemetryService } from './services/device-telemetry.service';
     IoTCommandService,
     IoTCommandV1Service,
     CommandFactory,
-    CommandProcessor,
+    ...(process.env.REDIS_CACHE_ENABLED === 'true' ? [CommandProcessor, CommandV1Processor] : []),
     MqttService,
     DeviceService,
     DeviceRegistryService,

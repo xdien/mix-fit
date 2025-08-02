@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bullmq';
 import { Repository } from 'typeorm';
@@ -17,7 +17,7 @@ export class IoTCommandV1Service {
   constructor(
     @InjectRepository(DeviceEntity)
     private readonly deviceRepository: Repository<DeviceEntity>,
-    @InjectQueue('iot-commands') private commandQueue: Queue,
+    @Optional() @InjectQueue('iot-commands') private commandQueue?: Queue,
   ) {}
 
   async executeCommand(
@@ -31,6 +31,10 @@ export class IoTCommandV1Service {
 
     if (!device) {
       throw new NotFoundException(`Device ${deviceId} not found`);
+    }
+
+    if (!this.commandQueue) {
+      throw new Error('Command queue is not available. Redis may be disabled.');
     }
 
     const job = await this.commandQueue.add(QueueNameEnum.REDIS_QUEUE_IOT_V1, {
@@ -48,13 +52,13 @@ export class IoTCommandV1Service {
   }
 
   async getCommandStatus(commandId: string): Promise<ICommandResponse> {
+    if (!this.commandQueue) {
+      throw new Error('Command queue is not available. Redis may be disabled.');
+    }
+
     const job = await this.commandQueue.getJob(commandId);
 
     if (!job) {
-      throw new NotFoundException(`Command ${commandId} not found`);
-    }
-
-    if (job.id === undefined) {
       throw new NotFoundException(`Command ${commandId} not found`);
     }
 

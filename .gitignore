@@ -90,3 +90,4 @@ mosquitto/config/.mosquitto_passwd
 scripts/keys/**
 deployment/mosquitto/config/.mosquitto_passwd
 .diff
+yarn.lock
