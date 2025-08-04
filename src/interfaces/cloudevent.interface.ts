@@ -28,6 +28,7 @@ export class CloudEventDto<T = unknown> {
   @ApiProperty({
     description: 'The data associated with the event',
     type: 'object',
+    additionalProperties: true,
   })
   data!: T;
 }

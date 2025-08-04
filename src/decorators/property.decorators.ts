@@ -6,7 +6,8 @@ import { getVariableName } from '../common/utils';
 export function ApiBooleanProperty(
   options: Omit<ApiPropertyOptions, 'type'> = {},
 ): PropertyDecorator {
-  return ApiProperty({ type: Boolean, ...options });
+  const { required, ...restOptions } = options;
+  return ApiProperty({ type: Boolean, required: typeof required === 'boolean' ? required : undefined, ...restOptions });
 }
 
 export function ApiBooleanPropertyOptional(
@@ -19,11 +20,13 @@ export function ApiUUIDProperty(
   options: Omit<ApiPropertyOptions, 'type' | 'format'> &
     Partial<{ each: boolean }> = {},
 ): PropertyDecorator {
+  const { required, ...restOptions } = options;
   return ApiProperty({
-    type: options.each ? [String] : String,
+    type: String,
     format: 'uuid',
     isArray: options.each,
-    ...options,
+    required: typeof required === 'boolean' ? required : undefined,
+    ...restOptions,
   });
 }
 
@@ -40,14 +43,14 @@ export function ApiEnumProperty<TEnum>(
 ): PropertyDecorator {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const enumValue = getEnum() as any;
+  const { required, ...restOptions } = options;
 
   return ApiProperty({
-    type: 'enum',
-    // throw error during the compilation of swagger
-    // isArray: options.each,
     enum: enumValue,
     enumName: getVariableName(getEnum),
-    ...options,
+    required: typeof required === 'boolean' ? required : undefined,
+    isArray: options.each,
+    ...restOptions,
   });
 }
 

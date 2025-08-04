@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import type { ThrottlerOptions } from '@nestjs/throttler';
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { isNil } from 'lodash';
-import type { Units } from 'parse-duration';
+// parse-duration v2+ doesn't export Units type, using string instead
 import { default as parse } from 'parse-duration';
 
 import { UserSubscriber } from '../../entity-subscribers/user-subscriber';
@@ -35,11 +35,11 @@ export class ApiConfigService {
     }
   }
 
-  private getDuration(key: string, format?: Units): number {
+  private getDuration(key: string, format?: string): number {
     const value = this.getString(key);
     const duration = parse(value, format);
 
-    if (duration === undefined) {
+    if (duration === undefined || duration === null) {
       throw new Error(`${key} environment variable is not a valid duration`);
     }
 
@@ -94,7 +94,7 @@ export class ApiConfigService {
     return {
       entities,
       migrations,
-      keepConnectionAlive: !this.isTest,
+      // keepConnectionAlive removed in newer TypeORM versions
       dropSchema: this.isTest,
       type: this.getString('DB_TYPE') as any,
       name: 'default',
@@ -121,7 +121,7 @@ export class ApiConfigService {
     return {
       entities,
       migrations,
-      keepConnectionAlive: !this.isTest,
+      // keepConnectionAlive removed in newer TypeORM versions
       dropSchema: this.isTest,
       type: this.getString('CMS_DB_TYPE') as any,
       name: 'cms',
@@ -147,7 +147,7 @@ export class ApiConfigService {
     return {
       entities,
       //   migrations,
-      keepConnectionAlive: !this.isTest,
+      // keepConnectionAlive removed in newer TypeORM versions
       dropSchema: this.isTest,
       type: this.getString('IOT_DB_TYPE') as any,
       name: 'iot',

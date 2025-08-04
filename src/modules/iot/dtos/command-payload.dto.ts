@@ -16,7 +16,7 @@ export class CommandPayloadDto implements Omit<ICommandPayload, 'deviceId'> {
 
   @ApiProperty({
     description: 'Parameters control device',
-    type: CommandParametersDto,
+    type: () => CommandParametersDto,
     required: false,
   })
   @IsObject()
@@ -34,7 +34,7 @@ export class CommandPayloadDto implements Omit<ICommandPayload, 'deviceId'> {
     description: 'Metadata bổ sung',
     example: { location: 'warehouse-1', floor: '2nd' },
     required: false,
-    type: 'object',
+    type: Object,
     additionalProperties: true,
   })
   metadata?: Record<string, unknown>;
