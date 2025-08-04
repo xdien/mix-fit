@@ -7,7 +7,11 @@ export function ApiBooleanProperty(
   options: Omit<ApiPropertyOptions, 'type'> = {},
 ): PropertyDecorator {
   const { required, ...restOptions } = options;
-  return ApiProperty({ type: Boolean, required: typeof required === 'boolean' ? required : undefined, ...restOptions });
+  return ApiProperty({
+    type: Boolean,
+    required: typeof required === 'boolean' ? required : undefined,
+    ...restOptions,
+  });
 }
 
 export function ApiBooleanPropertyOptional(
@@ -41,7 +45,6 @@ export function ApiEnumProperty<TEnum>(
   getEnum: () => TEnum,
   options: Omit<ApiPropertyOptions, 'type'> & { each?: boolean } = {},
 ): PropertyDecorator {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const enumValue = getEnum() as any;
   const { required, ...restOptions } = options;
 

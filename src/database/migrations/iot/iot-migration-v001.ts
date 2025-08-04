@@ -20,7 +20,6 @@ export class IotMigration1722948641071 implements MigrationInterface {
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {
-    // eslint-disable-next-line no-console
     void queryRunner.query('');
   }
 }

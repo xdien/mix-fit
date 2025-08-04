@@ -38,7 +38,6 @@ export class AbstractWithIdDto {
       const fields: Record<string, string> = {};
 
       for (const key of Object.keys(translationEntity)) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const metadata = Reflect.getMetadata(
           DYNAMIC_TRANSLATION_DECORATOR_KEY,
           this,

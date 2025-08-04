@@ -64,7 +64,9 @@ import { DeviceTelemetryService } from './services/device-telemetry.service';
     IoTCommandService,
     IoTCommandV1Service,
     CommandFactory,
-    ...(process.env.REDIS_CACHE_ENABLED === 'true' ? [CommandProcessor, CommandV1Processor] : []),
+    ...(process.env.REDIS_CACHE_ENABLED === 'true'
+      ? [CommandProcessor, CommandV1Processor]
+      : []),
     MqttService,
     DeviceService,
     DeviceRegistryService,

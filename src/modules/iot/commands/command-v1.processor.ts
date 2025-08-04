@@ -27,7 +27,8 @@ export class CommandV1Processor extends WorkerHost {
     @InjectRepository(DeviceEntity)
     private readonly deviceRepository: Repository<DeviceEntity>,
     private readonly commandFactory: CommandFactory,
-    @Optional() @InjectQueue(QueueNameEnum.REDIS_QUEUE_IOT_V1)
+    @Optional()
+    @InjectQueue(QueueNameEnum.REDIS_QUEUE_IOT_V1)
     private readonly commandV1Queue?: Queue<ICommandPayload>,
   ) {
     super();
@@ -189,7 +190,9 @@ export class CommandV1Processor extends WorkerHost {
     errorMessage: string,
   ) {
     if (!this.commandV1Queue) {
-      this.logger.error('Command queue is not available. Redis may be disabled.');
+      this.logger.error(
+        'Command queue is not available. Redis may be disabled.',
+      );
       return;
     }
 

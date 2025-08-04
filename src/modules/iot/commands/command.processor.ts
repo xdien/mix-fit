@@ -26,7 +26,8 @@ export class CommandProcessor extends WorkerHost {
     @InjectRepository(DeviceEntity)
     private readonly deviceRepository: Repository<DeviceEntity>,
     private readonly commandFactory: CommandFactory,
-    @Optional() @InjectQueue('iot-commands')
+    @Optional()
+    @InjectQueue('iot-commands')
     private readonly commandQueue?: Queue<ICommandPayload>,
   ) {
     super();
@@ -188,7 +189,9 @@ export class CommandProcessor extends WorkerHost {
     errorMessage: string,
   ) {
     if (!this.commandQueue) {
-      this.logger.error('Command queue is not available. Redis may be disabled.');
+      this.logger.error(
+        'Command queue is not available. Redis may be disabled.',
+      );
       return;
     }
 

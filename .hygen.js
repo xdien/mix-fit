@@ -113,4 +113,4 @@ module.exports = {
       return this.inflection.dasherize(name).toLowerCase();
     },
   },
-}
+};

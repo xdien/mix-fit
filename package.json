@@ -37,7 +37,7 @@
     "docs:dev": "vuepress dev -p 7070",
     "docs:build": "DEPLOY_ENV=gh-pages vuepress build",
     "docs:deploy": "yarn docs:build && gh-pages -d .vuepress/dist",
-    "prepare": "husky install",
+    "prepare": "husky",
     "release": "release-it",
     "generate:proto": "node scripts/generateProtoTS.js"
   },

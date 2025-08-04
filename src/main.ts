@@ -1,5 +1,3 @@
-/* eslint-disable unicorn/prefer-top-level-await */
-
 import 'reflect-metadata';
 
 import {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import type { Type } from '@nestjs/common';
 import { applyDecorators } from '@nestjs/common';
 import {

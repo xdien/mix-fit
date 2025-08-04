@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable unicorn/number-literal-case */
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 

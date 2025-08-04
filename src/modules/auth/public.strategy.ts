@@ -10,7 +10,10 @@ class PublicStrategyBase extends Strategy {
 }
 
 @Injectable()
-export class PublicStrategy extends PassportStrategy(PublicStrategyBase, 'public') {
+export class PublicStrategy extends PassportStrategy(
+  PublicStrategyBase,
+  'public',
+) {
   constructor() {
     super();
   }

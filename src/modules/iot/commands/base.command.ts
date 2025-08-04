@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/number-literal-case */
 import type { ICommand } from '@nestjs/cqrs';
 
 import type { ICommandPayload } from './iot-command.interface';

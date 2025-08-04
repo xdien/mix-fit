@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { getDataSourceByName } from 'typeorm-transactional';
 
 import { DataSourceNameEnum } from '../constants/datasoure-name';

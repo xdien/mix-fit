@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable unicorn/no-null */
 import { applyDecorators } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Column } from 'typeorm';
@@ -27,8 +25,6 @@ import { Transform, Type } from 'class-transformer';
 import type { Constructor } from '../types';
 import type { ApiPropertyOptions } from '@nestjs/swagger';
 
-
-
 interface IFieldOptions {
   each?: boolean;
   swagger?: boolean;
@@ -54,7 +50,9 @@ type IClassFieldOptions = IFieldOptions;
 type IBooleanFieldOptions = IFieldOptions;
 type IEnumFieldOptions = IFieldOptions;
 
-function convertRequiredToBoolean(required: boolean | string[] | undefined): boolean | undefined {
+function convertRequiredToBoolean(
+  required: boolean | string[] | undefined,
+): boolean | undefined {
   if (typeof required === 'boolean') {
     return required;
   }
@@ -80,11 +78,13 @@ export function NumberField(
 
   if (options.swagger !== false) {
     const { required, ...restOptions } = options;
-    decorators.push(ApiProperty({ 
-      type: Number, 
-      required: convertRequiredToBoolean(required),
-      ...restOptions 
-    }));
+    decorators.push(
+      ApiProperty({
+        type: Number,
+        required: convertRequiredToBoolean(required),
+        ...restOptions,
+      }),
+    );
   }
 
   if (options.each) {
@@ -141,7 +141,12 @@ export function StringField(
   if (options.swagger !== false) {
     const { required, ...restOptions } = options;
     decorators.push(
-      ApiProperty({ type: String, required: convertRequiredToBoolean(required), ...restOptions, isArray: options.each }),
+      ApiProperty({
+        type: String,
+        required: convertRequiredToBoolean(required),
+        ...restOptions,
+        isArray: options.each,
+      }),
     );
   }
 
@@ -184,7 +189,13 @@ export function BooleanField(
 
   if (options.swagger !== false) {
     const { required, ...restOptions } = options;
-    decorators.push(ApiProperty({ type: Boolean, required: convertRequiredToBoolean(required), ...restOptions }));
+    decorators.push(
+      ApiProperty({
+        type: Boolean,
+        required: convertRequiredToBoolean(required),
+        ...restOptions,
+      }),
+    );
   }
 
   return applyDecorators(...decorators);
@@ -496,10 +507,7 @@ export function DateFieldOptional(
 export function IotDataField(
   options: Omit<ApiPropertyOptions, 'type'> & IFieldOptions = {},
 ): PropertyDecorator {
-  const decorators = [
-    Column({ type: 'jsonb' }),
-    Type(() => Object),
-  ];
+  const decorators = [Column({ type: 'jsonb' }), Type(() => Object)];
 
   if (options.nullable) {
     decorators.push(IsOptional());
@@ -549,10 +557,7 @@ export function PasswordFieldOptional(
 export function TranslationsField(
   options: Omit<ApiPropertyOptions, 'isArray'> & IFieldOptions = {},
 ): PropertyDecorator {
-  const decorators = [
-    Column({ type: 'json' }),
-    Type(() => Object),
-  ];
+  const decorators = [Column({ type: 'json' }), Type(() => Object)];
 
   if (options.nullable) {
     decorators.push(IsOptional());
