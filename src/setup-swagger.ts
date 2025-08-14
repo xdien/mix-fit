@@ -1,8 +1,10 @@
 import type { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { Request, Response } from 'express';
 
 export function setupSwagger(app: INestApplication): void {
   const documentBuilder = new DocumentBuilder()
+    .setOpenAPIVersion('3.1.0')
     .setTitle('API')
     .setDescription(
       `### REST
@@ -54,14 +56,27 @@ Routes is following REST standard (Richardson level 3)
     documentBuilder.setVersion(process.env.API_VERSION);
   }
 
-  const document = SwaggerModule.createDocument(app, documentBuilder.build());
+  const document = SwaggerModule.createDocument(app, documentBuilder.build(), {
+    extraModels: [],
+    operationIdFactory: (controllerKey: string, methodKey: string) =>
+      `${controllerKey}_${methodKey}`,
+  });
+
   SwaggerModule.setup('documentation', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
     },
   });
 
+  // Add endpoint for OpenAPI JSON with proper validation
+  app.use('/documentation-json', (_req: Request, res: Response) => {
+    res.json(document);
+  });
+
   console.info(
     `Documentation: http://localhost:${process.env.PORT}/documentation`,
+  );
+  console.info(
+    `OpenAPI JSON: http://localhost:${process.env.PORT}/documentation-json`,
   );
 }
